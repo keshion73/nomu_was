@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head', { title: "" } ) %>
+<body>
+    <div class="main-content">
+        <div class="container-fluid">
+            <h3 class="page-title">
+                업체관리
+                <!-- <div class="form-inline pull-right">
+                    <button type="button" class="btn btn-success btn-excel"><i class="fa fa-download"></i> Excel Download</button>  
+                </div> -->
+            </h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <table class="table table-striped" id="table" data-paging-position="right">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- Javascript -->
+	<script src="assets/vendor/jquery/jquery.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/vendor/footable/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Add in any FooTable dependencies we may need -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+	<!-- FOO TABLE 필요시 모듈화 -->
+	<script src="assets/vendor/footable/js/footable.min.js"></script>
+    <script>
+        let table = {}
+
+        jQuery(function($){
+            table = FooTable.init('#table', {
+		        "toggleColumn": "last",
+                "paging": {
+                    "enabled": true
+                },
+                "filtering": {
+                    "enabled": true
+                },
+                "sorting": {
+                    "enabled": true
+                },
+                "empty" : "항목이 존재하지 않습니다.",
+                "columns": [
+                    { "name": "id", "title": "#", "breakpoints": "xs" },
+                    { "name": "email_id", "title": "ID", "breakpoints": "xs md sm" },
+                    { "name": "nameTag", "title": "회사명", "breakpoints": "" },
+                    { "name": "boss_name", "title": "대표자", "breakpoints": "xs" },
+                    { "name": "payDay", "title": "급여일", "breakpoints": "xs" },
+                    { "name": "phone", "title": "대표번호", "breakpoints": "xs" },
+                    { "name": "fax", "title": "FAX", "breakpoints": "xs md sm" },
+                    { "name": "admin_name", "title": "담당자", "breakpoints": "xs md sm" },
+                    { "name": "admin_phone", "title": "담당자 휴대폰", "breakpoints": "" },
+                    { "name": "email", "title": "담당자 이메일", "breakpoints": "xs md sm" },
+                    { "name": "business_number", "title": "사업자 번호", "breakpoints": "xs md sm" },
+                ]
+                
+            })
+
+            reloadTable()
+
+			$("#table").on("click", "tr", (e) => {
+				const id = $(e.target.parentElement.parentElement).find('td:first').text()
+
+				if ( id != "" ) {
+					$('#workerListModal').modal('hide')
+					
+					parent.showCompanyDetail(id)
+				}
+				
+			})
+        });
+
+        function dropUser( id, email ) {
+            // 확인 팝업으로 대체.
+            if ( confirm("정말 회원을 탈퇴시키겠습니까?\n최대 12시간 이후 해당 회원의 로그인 세션이 만료 되고 해당 회원에게 탈퇴 처리에 관한 메일이 발송 됩니다.") ) {
+                $.ajax({
+                    type: "PUT",
+                    url: "<%=config.path.rest%>v1/auth/drop/" + id,
+                    data: { email: email },
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        reloadTable()
+                    } else {	
+                        alert( result.errMsg )
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "네트워크 오류입니다." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+            }
+        }
+
+        function initPassword( id, email ) {
+            if ( confirm( "비밀번호를 초기화 하시겠습니까?\n해당 회원에게 메일이 발송 됩니다.") ) {
+                $.ajax({
+                    type: "POST",
+                    url: "<%=config.path.rest%>v1/auth/reset/password/" + id,
+                    data: { email: email },
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        reloadTable()
+                    } else {	
+                        alert( result.errMsg )
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "네트워크 오류입니다." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+            }
+        }
+
+        function setRolls( id ) {
+            alert( "setRolls(" + id + ")" )
+        }
+
+        function reloadTable() {
+            $.ajax({
+				type: "GET",
+				url: "<%=config.path.rest%>v1/company/list",
+                headers: {
+					'Authorization': 'Bearer ' + '<%= nomu.token %>',
+				},  
+			}).done(function (data, textStatus, xhr) {
+				let result = data
+				if(result.success == 1){
+                    result.result.list.map( (item) => {
+                        item.nameTag = "\
+                            <div class='btn-group'>\
+                                <a class='dropdown-toggle " + (item.is_block_user == 1 ? "text-danger" : "" ) + "' data-toggle='dropdown'>" + item.name + "<span class='caret'></span></a>\
+                                    <ul class='dropdown-menu' role='menu'>" + 
+                                                (item.is_block_user == 0 ? "<li><a href='javascript:dropUser(" + item.id + ",\"" + item.email + "\")'><span class='text-danger'>탈퇴 처리</span></a></li>" : "") + "\
+                                                <li><a href='javascript:initPassword(" + item.id + ",\"" + item.email + "\")'>비밀번호 초기화</a></li>\
+                                                <li><a href='javascript:setRolls(" + item.id + ")'>권한 설정</a></li>\
+                                                <li class='divider'></li>\
+                                                <li><a href='javascript:parent.showCompanyDetail(" + item.id + ")'>업체 정보</a></li>\
+                                            </ul>\
+                                    </div>\
+                        "
+                        item.payDay = 10
+                        return item
+                    })
+                    table.rows.load( result.result.list )
+				} else {	
+					alert( result.errMsg )
+				}
+			}).fail(function(data, textStatus, errorThrown){
+				let result = eval("("+data.responseText+")")
+
+                if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+					alert( "네트워크 오류입니다." )
+				} else {
+					alert( result.errMsg )
+				}
+			});
+        }
+    </script>
+</body>
+
+</html>

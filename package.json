@@ -1,0 +1,25 @@
+{
+  "name": "was_nomu",
+  "version": "0.0.1",
+  "description": "was nomu",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ANJZ",
+  "license": "ISC",
+  "dependencies": {
+    "@root/keypairs": "^0.10.3",
+    "cookie-parser": "^1.4.6",
+    "cryptlib": "^1.0.3",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "express-session": "^1.17.2",
+    "greenlock-express": "^4.0.3",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "request": "^2.88.2",
+    "vhost": "^3.0.2"
+  }
+}

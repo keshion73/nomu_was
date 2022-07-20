@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en" class="fullscreen-bg">
+<%- include( 'head', { title: "Login" } ) %>
+<body>
+	<!-- WRAPPER -->
+	<div id="wrapper">
+		<div class="vertical-align-wrap">
+			<div class="vertical-align-middle">
+				<div class="auth-box ">
+					<div class="left">
+						<div class="content">
+							<div class="header">
+								<div class="logo text-center"><img src="assets/img/logo-dark.png" alt="DrNomu Logo"></div>
+								<p class="lead">회사 계정을 사용하여 로그인 해 주세요</p>
+							</div>
+							<form id="signin-form" class="form-auth-small">
+								<div class="form-group">
+									<label for="signin-email" class="control-label sr-only">사용자 ID</label>
+									<input type="text" class="form-control" name="id" id="signin-id" value="" placeholder="사용자 ID">
+								</div>
+								<div class="form-group">
+									<label for="signin-password" class="control-label sr-only">비밀번호</label>
+									<input type="password" class="form-control" name="password" id="signin-password" value="" placeholder="비밀번호">
+								</div>
+								<div class="form-group clearfix">
+									<label class="fancy-checkbox element-left">
+										<input type="checkbox" id="autologin">
+										<span>자동로그인</span>
+									</label>
+									<span class="helper-text element-right"> <a data-toggle="modal" data-target="#agreementModal">회원가입</a></span>
+								</div>
+								<button type="submit" class="btn btn-primary btn-lg btn-block">로그인</button>
+								<div class="bottom">
+									<span class="helper-text"><i class="fa fa-lock"></i> <a data-toggle="modal" data-target="#changePasswordModal">아이디나 비밀번호를 잃어버리셨나요?</a></span>
+								</div>
+								<input type="hidden" name="autologin" id="signin-autologin" value="0">
+							</form>
+						</div>
+					</div>
+					<div class="right">
+						<div class="overlay"></div>
+						<div class="content text">
+							<h1 class="heading">지금 바로 노무박사를 사용해 보세요</h1>
+							<p>노무박사는 항상 여러분의 곁에 있습니다</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- END WRAPPER -->
+	<!-- Large modal -->
+	<div id="agreementModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+			<div class="modal-content">
+				<%- include( 'agreement' ) %>
+			</div>
+		</div>
+	</div>
+	<%- include( 'modal', { id: "changePassword", content: "changePasswordContent", isLarge: 0 } ) %>
+</body>
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="assets/scripts/klorofil-common.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<%- include( 'companyFormScript' ) %>
+<script>
+	let inputs = [
+		{ id: "password", feedback_id: "password_feedback", type: validate_types.password, minLen: 8, maxLen: 25, feedback: "숫자, 대소문자영어, 특수문자 포함하여 입력해주세요.(8-25자)", required: true },
+		{ id: "name", feedback_id: "name_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+		{ id: "business_number", feedback_id: "business_number_feedback", type: validate_types.business_number, minLen: 1, maxLen: 12, feedback: "형식을 확인해주세요.(ex: 111-11-11111)", required: true },
+		{ id: "boss_name", feedback_id: "boss_name_feedback", type: validate_types.none, minLen: 1, maxLen: 50, feedback: "대표님의 성함을 입력해주세요.(1-100자)", required: true },
+		{ id: "tel", feedback_id: "tel_feedback", type: validate_types.tel, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 032-111-11111)", required: true },
+		{ id: "fax", feedback_id: "fax_feedback", type: validate_types.tel, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 032-111-11111)", required: false },
+		{ id: "admin_name", feedback_id: "admin_name_feedback", type: validate_types.none, minLen: 1, maxLen: 50, feedback: "담당자분의 성함을 입력해주세요.(1-100자)", required: true },
+		{ id: "admin_hp", feedback_id: "admin_hp_feedback", type: validate_types.hp, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 010-111-11111)", required: true },
+		{ id: "admin_email", feedback_id: "admin_email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+	]
+	let othersValidate = () => {
+		// TODO: stamp
+        validateItem( inputId[0], false )
+
+		if ( $('#' + inputId[0].feedback_id ).text() == '' && checkedId == "" && $('#' + inputId[0].id ).val() != "" ) {
+			$('#' + inputId[0].feedback_id ).text("중복 확인을 해 주세요")
+		}
+
+		if ( $('#id_feedback_checked' ).text() != "" ) {
+			return true
+		}
+
+		return false
+	}
+	let inputId = [
+		{ id: "email_id", feedback_id: "id_feedback", type: validate_types.id, minLen: 6, maxLen: 20, feedback: "소문자 영문/숫자(6-20자)", required: true },
+	]
+
+	$(() => { 
+		initUI()
+		initPopup()
+	})
+
+	function initJoin() {	
+		$.get("companyDetailContent", (data) => {
+			$('#agreementModal').find('.modal-content').html(data)
+			// 가입의 실제 폼은 여기서 구성된다.
+			initFormId()	// id 밸리에이션은 조건도 다르고, 여기서만 수행.
+			initForm(inputs)
+			initFormPasswordConfirm()
+			// 업체 정보 로딩될 경우 이후 수행.
+			setStampPrev()
+		})
+	}
+
+	function initPopup() {
+		$('#toJoinButton').click( () => { 
+			if ( $('#checkAgreement').is(':checked') ) {		
+				initJoin()
+			} else {
+				alert("약관에 동의해 주세요")
+			}
+		})
+	}
+
+	function initUI() {
+		$("#signin-form").submit((e) => {
+        	//prevent Default functionality
+	        e.preventDefault();
+
+			let formdatas = $('#signin-form').serializeArray()
+			$.ajax({
+				type: "POST",
+				url: "<%=config.path.rest%>v1/auth/signIn",
+				data: $('#signin-form').serialize(),          
+			}).done(function (data, textStatus, xhr) {
+				let result = data
+				if(result.success == 1){
+					$.cookie( '<%=config.cookie.autoLoginKey%>', formdatas.find( (item) => { return item.name == "autologin" } ).value )
+					$.cookie( '<%=config.cookie.uidKey%>', formdatas.find( (item) => { return item.name == "id" } ).value )
+					$.cookie( '<%=config.cookie.nomuSessionId%>', result.result.jwtToken )
+
+					location.href = "main"
+				} else {	
+					if ( result.errMsg === 'undefined' ) {
+						alert( "로그인을 실패하였습니다. 관리자에게 문의하세요." )
+					} else {
+						alert( result.errMsg )
+					}
+				}
+			}).fail(function(data, textStatus, errorThrown){
+				let result = eval("("+data.responseText+")")
+
+				if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+					alert( "로그인을 실패하였습니다. 관리자에게 문의하세요." )
+				} else {
+					alert( result.errMsg )
+				}
+			});
+		})
+
+		$('#autologin').click( () => { 
+			if ( $('#autologin').is(':checked') ) {			
+				$('#signin-autologin').val(1)
+			} else {
+				$('#signin-autologin').val(0)
+			}
+		})
+		
+		<%if (autoLogin == '1') {%>
+			$('#autologin').attr('checked', true)	
+			$('#signin-autologin').val(1)
+		<% } else { %>
+			$('#autologin').attr('checked', false)
+			$('#signin-autologin').val(0)
+		<% } %>
+
+		<%if (savedId !== 'undefined' && savedId != '') {%>
+			$('#signin-id').val("<%=savedId%>")
+		<% } %>
+	}
+
+	function initFormId() {
+
+		for ( let i=0; i<inputId.length; i++ ) {
+			$('#' + inputId[i].id ).keyup( () => {
+                validateItem( inputId[i] )
+				// true 일 때, 중복 여부 확인 필요.
+				//$('#' + inputs[i].feedback_id ).text(inputs[i].feedback)
+
+				let userId = $('#' + inputId[i].id ).val()
+				if ( userId != checkedId ) {
+					$('#id_feedback_checked' ).text("")
+					checkedId = ""
+				}
+			})
+		}
+	}
+
+	let checkedId = ""
+
+	function checkUserId() {
+		// (1) validate, 성공시
+        validateItem( inputId[0], false )
+
+		if ( $('#' + inputId[0].feedback_id ).text() == '' ) {
+			let userId = $('#' + inputId[0].id ).val()
+			// (2) ajax
+			$.ajax({
+				type: "GET",
+				url: "<%=config.path.rest%>v1/auth/duplicated/" + userId,
+				data: {}
+			}).done(function (data, textStatus, xhr) {
+				let result = data
+				if(result.success == 1){
+					$('#id_feedback_checked' ).text("사용 가능한 ID 입니다")
+					checkedId = userId
+				} else {
+					if ( result.errMsg === 'undefined' ) {
+						alert( "통신에 실패하였습니다" )
+					} else {
+						$('#' + inputId[0].feedback_id ).text("이미 존재하는 ID 입니다")
+					}
+				}
+			}).fail(function(data, textStatus, errorThrown){
+				let result = eval("("+data.responseText+")")
+
+				if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+					alert( "통신에 실패하였습니다" )
+				} else {
+					$('#' + inputId[0].feedback_id ).text("이미 존재하는 ID 입니다")
+				}
+			});
+		} else {
+
+		}
+	}
+</script>
+<script>
+	let findPwdInputs = [
+		{ id: "findpwd_id", feedback_id: "findpwd_id_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+		{ id: "findpwd_email", feedback_id: "findpwd_email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+	]
+	let findIdInputs = [
+		{ id: "findid_email", feedback_id: "findid_email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+	]
+
+	function clearFindId() {
+		$('#findIdForm input').each(
+			function(index){  
+				var input = $(this)
+				input.val("")
+			}
+		)
+	}
+
+	function clearFindPwd() {
+		$('#findPwdForm input').each(
+			function(index){  
+				var input = $(this)
+				input.val("")
+			}
+		)
+	}
+
+	function findId() {
+		if ( validateAllInputs( findIdInputs ) == false ) {
+			return
+		}
+		
+		$.ajax({
+			type: "POST",
+			url: "<%=config.path.rest%>v1/auth/find/id",
+			data: $('#findIdForm').serialize(),
+		}).done(function (data, textStatus, xhr) {
+			let result = data
+			if(result.success == 1){
+				alert( "가입하신 아이디가 메일 주소로 발송 되었습니다.")
+				$('#find_close').click()
+				clearFindId()
+			} else {
+				if ( result.errMsg === 'undefined' ) {
+					alert( "통신에 실패하였습니다" )
+				} else {
+					alert( result.errMsg )
+				}
+			}
+		}).fail(function(data, textStatus, errorThrown){
+			let result = eval("("+data.responseText+")")
+
+			if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+				alert( "통신에 실패하였습니다" )
+			} else {
+				alert( result.errMsg )
+			}
+		});
+
+	}
+
+	function findPwd() {
+		if ( validateAllInputs( findPwdInputs ) == false ) {
+			return
+		}
+		
+		$.ajax({
+			type: "POST",
+			url: "<%=config.path.rest%>v1/auth/find/password",
+			data: $('#findPwdForm').serialize(),
+		}).done(function (data, textStatus, xhr) {
+			let result = data
+			if(result.success == 1){
+				alert( "비밀번호가 초기화 되어 메일 주소로 발송 되었습니다.")
+				$('#find_close').click()
+				clearFindPwd()
+			} else {
+				if ( result.errMsg === 'undefined' ) {
+					alert( "통신에 실패하였습니다" )
+				} else {
+					alert( result.errMsg )
+				}
+			}
+		}).fail(function(data, textStatus, errorThrown){
+			let result = eval("("+data.responseText+")")
+
+			if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+				alert( "통신에 실패하였습니다" )
+			} else {
+				alert( result.errMsg )
+			}
+		});
+
+
+	}
+	// 	<button type="button" id="javascript:findClose()" class="close" data-dismiss="modal">&times;</button>
+	// 			<input id="findid_email" name="findid_email" type="text" class="form-control" placeholder="담당자 이메일">
+	// 			<small class="invalid-feedback text-danger" id="findid_email_feedback"></small>
+	
+	// 			<input id="findpwd_id" name="findpwd_id" type="text" class="form-control" placeholder="사용자 ID">
+	// 			<small class="invalid-feedback text-danger" id="findpwd_id_feedback"></small>
+	
+	// 			<input id="findpwd_email" name="findpwd_email" type="text" class="form-control" placeholder="담당자 이메일">
+	// 			<small class="invalid-feedback text-danger" id="findpwd_email_feedback"></small>
+	
+	// <form class="container-fluid" id="findIdForm" onsubmit="javascript:findId()">
+    // <form class="container-fluid" id="findPwdForm" onsubmit="javascript:findPwd()">
+</script>
+<%- include( 'addressSearchScript' ) %>
+</html>

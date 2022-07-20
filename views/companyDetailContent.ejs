@@ -1,0 +1,209 @@
+<div class="modal-header">
+    <button id="detail_close" type="button" class="close" data-dismiss="modal">&times;</button>
+    <h4 id="detail_title" class="modal-title">회원 가입</h4>
+</div>
+<div class="modal-body">
+    <div class="container-fluid">
+        <!-- <h3 class="page-title">업체 정보</h3> -->
+        <form class="container-fluid" id="companyForm" action="join" method="POST">
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label for="email_id" class="text-primary">ID *</label>
+                            <div class="input-group" id="email_id_parent">
+                                <input name="email_id" id="email_id" type="text" class="form-control" placeholder="사용자 ID">
+                                <span class="input-group-btn"><button id="detail_check_id" onclick="javascript:checkUserId()" type="button" class="btn btn-primary">중복확인</button></span>
+                            </div>
+                            <small class="invalid-feedback text-danger" id="id_feedback"></small>
+                            <small class="valid-feedback text-primary" id="id_feedback_checked"></small>
+                        </div>
+                    </div>
+                    <div class="row form-group" id="detail_password_row">
+                        <div class="col-md-4">
+                            <label for="password" class="text-primary">비밀번호 *</label>
+                            <input name="password" id="password" type="password" class="form-control" placeholder="비밀번호">
+                            <small class="invalid-feedback text-danger" id="password_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="password_confirm" class="text-primary">확인 *</label>
+                            <input type="password" id="password_confirm" class="form-control" placeholder="비밀번호 확인">
+                            <small class="invalid-feedback text-danger" id="password_confirm_feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label for="name" class="text-primary">회사명 *</label>
+                            <input name="name" id="name" type="text" class="form-control" placeholder="회사명">
+                            <small class="invalid-feedback text-danger" id="name_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="boss_name" class="text-primary">대표자 *</label>
+                            <input id="boss_name" name="boss_name" type="text" class="form-control" placeholder="대표자 성명">
+                            <small class="invalid-feedback text-danger" id="boss_name_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="name" class="text-primary">사업자 번호 *</label>
+                            <input name="business_number" id="business_number" type="text" class="form-control" placeholder="사업자 번호">
+                            <small class="invalid-feedback text-danger" id="business_number_feedback"></small>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label for="pay_day" class="text-primary">급여일 *</label>
+                            <select id="pay_day" name="pay_day" class="form-control">
+                                <option value="1">매월 1일</option>
+                                <option value="2">매월 2일</option>
+                                <option value="3">매월 3일</option>
+                                <option value="4">매월 4일</option>
+                                <option value="5">매월 5일</option>
+                                <option value="6">매월 6일</option>
+                                <option value="7">매월 7일</option>
+                                <option value="8">매월 8일</option>
+                                <option value="9">매월 9일</option>
+                                <option value="10">매월 10일</option>
+                                <option value="11">매월 11일</option>
+                                <option value="12">매월 12일</option>
+                                <option value="13">매월 13일</option>
+                                <option value="14">매월 14일</option>
+                                <option value="15">매월 15일</option>
+                                <option value="16">매월 16일</option>
+                                <option value="17">매월 17일</option>
+                                <option value="18">매월 18일</option>
+                                <option value="19">매월 19일</option>
+                                <option value="20">매월 20일</option>
+                                <option value="21">매월 21일</option>
+                                <option value="22">매월 22일</option>
+                                <option value="23">매월 23일</option>
+                                <option value="24">매월 24일</option>
+                                <option value="25">매월 25일</option>
+                                <option value="26">매월 26일</option>
+                                <option value="27">매월 27일</option>
+                                <option value="28">매월 28일</option>
+                                <option value="100">매월 말일</option>
+                                <!-- TODO: 말일 처리. 급여 계산 시작일 필요 -->
+                            </select>
+                            <small class="invalid-feedback text-danger" id="pay_day_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="pay_calc_day" class="text-primary">급여계산시작일 *</label>
+                            <select id="pay_calc_day" name="pay_calc_day" class="form-control">
+                                <option value="1">매월 1일</option>
+                                <option value="2">매월 2일</option>
+                                <option value="3">매월 3일</option>
+                                <option value="4">매월 4일</option>
+                                <option value="5">매월 5일</option>
+                                <option value="6">매월 6일</option>
+                                <option value="7">매월 7일</option>
+                                <option value="8">매월 8일</option>
+                                <option value="9">매월 9일</option>
+                                <option value="10">매월 10일</option>
+                                <option value="11">매월 11일</option>
+                                <option value="12">매월 12일</option>
+                                <option value="13">매월 13일</option>
+                                <option value="14">매월 14일</option>
+                                <option value="15">매월 15일</option>
+                                <option value="16">매월 16일</option>
+                                <option value="17">매월 17일</option>
+                                <option value="18">매월 18일</option>
+                                <option value="19">매월 19일</option>
+                                <option value="20">매월 20일</option>
+                                <option value="21">매월 21일</option>
+                                <option value="22">매월 22일</option>
+                                <option value="23">매월 23일</option>
+                                <option value="24">매월 24일</option>
+                                <option value="25">매월 25일</option>
+                                <option value="26">매월 26일</option>
+                                <option value="27">매월 27일</option>
+                                <option value="28">매월 28일</option>
+                                <!-- TODO: 28일 이후는 없는 달도 있어 지원할수 없다. -->
+                            </select>
+                            <small class="invalid-feedback text-danger" id="pay_calc_day_feedback"></small>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label for="tel" class="text-primary">대표번호 *</label>
+                            <input id="tel" name="tel" type="text" class="form-control" placeholder="전화번호">
+                            <small class="invalid-feedback text-danger" id="tel_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fax">FAX</label>
+                            <input id="fax" name="fax" type="text" class="form-control" placeholder="FAX번호">
+                            <small class="invalid-feedback text-danger" id="fax_feedback"></small>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label for="post_no" class="text-primary">주소 *</label>
+                            <div class="input-group" id="post_no_parent">
+                                <input id="post_no" name="post_no" type="text" class="form-control" placeholder="우편번호" readonly>
+                                <span class="input-group-btn"><button type="button" class="btn btn-primary" id="search_address" onclick="javascript:showSearchAddress()">주소검색</button></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <input id="address" name="address" type="text" class="form-control" placeholder="주소" readonly>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <input onkeyup="javascript:validateAddress()" id="address_detail" name="address_detail" type="text" class="form-control" placeholder="상세주소">
+                            <small class="invalid-feedback text-danger" id="address_feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label for="admin_name" class="text-primary">담당자 *</label>
+                            <input id="admin_name" name="admin_name" type="text" class="form-control" placeholder="담당자 성명">
+                            <small class="invalid-feedback text-danger" id="admin_name_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="admin_hp" class="text-primary">연락처 *</label>
+                            <input id="admin_hp" name="admin_hp" type="text" class="form-control" placeholder="담당자 휴대폰">
+                            <small class="invalid-feedback text-danger" id="admin_hp_feedback"></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="admin_email" class="text-primary">이메일 *</label>
+                            <input id="admin_email" name="admin_email" type="text" class="form-control" placeholder="담당자 이메일">
+                            <small class="invalid-feedback text-danger" id="admin_email_feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <label for="prevBox" class="text-primary">도장 이미지 *</label>
+                            <div class="prev-box hidden" id="prevBox" >
+                                <img id="preBoxImg" src=""  width="80" alt="nomu stamp image" crossorigin="anonymous" />
+                            </div>
+                            <input name="stamp_picture" type="file" accept="image/*" class="form-control-file" id="stamp_picture" onchange="javascript:uploadTempStamp()">
+                            <small class="invalid-feedback text-danger" id="stamp_feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body" id="detail_input_info">
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <small class="text-primary">* 표기된 항목은 필수 입력 항목입니다.</small>
+                            <small class="text-primary">* 담당자의 핸드폰 번호는 카카오톡에 가입된 번호여야 합니다.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input id="stamp_picture_url" name="stamp_picture_url" type="hidden">
+            <input id="stamp_picture_temp_url" name="stamp_picture_temp_url" type="hidden">
+            <input id="stamp_picture_temp_guid" name="stamp_picture_temp_guid" type="hidden">
+            <input id="user_id" name="user_id" type="hidden">
+        </form>
+    </div>        
+</div>
+<div id="detail_footer" class="modal-footer">
+    <button id="selfdrop_button" type="button" class="btn btn-danger pull-left hidden" onclick="javascript:selfBlock()">탈퇴하기</button>
+    <button id="submit_button" type="button" class="btn btn-primary" onclick="javascript:prepareSubmit( inputs, othersValidate )">가입하기</button>
+</div>

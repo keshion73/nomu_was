@@ -1,0 +1,35 @@
+<div class="row form-group sep-top-line">
+    <% for (var i = 0;i < Number(basicCount);i++) { %> 
+        <div class="col-md-2">
+            <label for="benefit_<%=i%>" class="text-normal"><%=benefits[i].title%></label>
+            <input value="<%=benefits[i].stringValue%>" id="benefit_<%=i%>" name="benefit_<%=i%>" type="text" class="form-control" placeholder="" onFocusOut="removeChar(event);inputNumberFormat(this);" onKeyUp="removeChar(event, this);inputNumberFormat(this);" onKeyDown="inputNumberFormat(this);">
+            <small class="invalid-feedback text-danger" id="benefit_<%=i%>_feedback"></small>
+        </div>  
+    <% } %> 
+</div>
+<div class="row form-group">
+    <% for (var j = 0;j < benefits.length-Number(basicCount);j++) { %> 
+        <div class="col-md-2">
+            <label for="benefit_<%=j+Number(basicCount)%>" class="text-normal"><%=benefits[j+Number(basicCount)].title%></label>
+            <!---->
+            <input value="<%=benefits[j+Number(basicCount)].stringValue%>" id="benefit_<%=j+Number(basicCount)%>" name="benefit_<%=j+Number(basicCount)%>" type="text" class="form-control" placeholder="" onFocusOut="removeChar(event);inputNumberFormat(this);" onKeyUp="removeChar(event, this);inputNumberFormat(this);" onKeyDown="inputNumberFormat(this);">
+            <!-- 추후 수당 추가 가능할 때 ( 임금대장 등 까지 포괄적으로 ) 추가
+            <div class="input-group">
+                <input value="<%=benefits[j+Number(basicCount)].stringValue%>" id="benefit_<%=j+Number(basicCount)%>" name="benefit_<%=j+Number(basicCount)%>" type="text" class="form-control" placeholder="" onFocusOut="removeChar(event);inputNumberFormat(this);" onKeyUp="removeChar(event, this);inputNumberFormat(this);" onKeyDown="inputNumberFormat(this);">
+                <span class="input-group-btn"><a class="form-control" href="javascript:removeBenefit('<%=benefits[j+Number(basicCount)].title%>')"><i class="fa fa-minus-circle"></i></a></span>
+            </div>
+            -->
+            <small class="invalid-feedback text-danger" id="benefit_<%=j+Number(basicCount)%>_feedback"></small>
+        </div>  
+    <% } %> 
+    <!-- 추후 수당 추가 가능할 때 ( 임금대장 등 까지 포괄적으로 ) 추가
+    <div class="col-md-2">
+        <label for="benefit_add" class="text-normal">수당추가</label>
+        <div class="input-group">
+            <input id="benefit_add" name="benefit_add" type="text" class="form-control" placeholder="수당이름">
+            <span class="input-group-btn"><a class="form-control" href="javascript:addBenefit($('#benefit_add').val(), () => { $('#benefit_add').val('') })"><i class="fa fa-plus-circle"></i></a></span>
+        </div>
+        <small class="invalid-feedback text-danger"></small>
+    </div>  
+    -->
+</div>

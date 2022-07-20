@@ -1,0 +1,219 @@
+<div class="row form-group">
+    <div class="col-md-2">
+        <label for="contract_start_date" class="text-primary">계약시작일 *</label>
+        <input id="contract_start_date" name="contract_start_date" type="text" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="contract_start_date_feedback"></small>
+    </div>
+    <div class="col-md-2">
+        <label for="contract_end_date" class="text-normal">계약종료일</label>
+        <input name="contract_end_date" id="contract_end_date" type="text" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="contract_end_date_feedback"></small>
+    </div>
+    <div class="col-md-2">
+        <label for="contract_writing_date" class="text-primary">계약서작성일 *</label>
+        <input name="contract_writing_date" id="contract_writing_date" type="text" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="contract_writing_date_feedback"></small>
+    </div>
+    <div class="col-md-2" id="rookie_container">
+        <label for="rookie" class="text-primary">수습 여부 *</label>
+        <select name="rookie" id="rookie" class="form-control">
+            <option value="0">X</option>
+            <option value="1">O</option>
+        </select>
+    </div>  
+    <div class="col-md-2" id="rookie_duration_container">
+        <label for="rookie_duration" class="text-primary">수습기간(월) *</label>
+        <input id="rookie_duration" name="rookie_duration" type="number" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="rookie_duration_feedback"></small>
+    </div>
+    <div class="col-md-2" id="rookie_percent_container">
+        <label for="rookie_percent" class="text-primary">수습 급여(%) *</label>
+        <input id="rookie_percent" name="rookie_percent" type="number" max="100" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="rookie_percent_feedback"></small>
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-md-2">
+        <label for="sallary" id="sallary_label" class="text-primary">월급여 *</label>
+        <input id="sallary" name="sallary" type="text" class="form-control" placeholder="" onFocusOut="removeChar(event);inputNumberFormat(this);" onKeyUp="removeChar(event, this);inputNumberFormat(this);" onKeyDown="inputNumberFormat(this);">
+        <small class="invalid-feedback text-danger" id="sallary_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="sallary_day" class="text-primary">급여일 *</label>
+        <select id="sallary_day" name="sallary_day" class="form-control" disabled>
+            <option value="1">매월 1일</option>
+            <option value="2">매월 2일</option>
+            <option value="3">매월 3일</option>
+            <option value="4">매월 4일</option>
+            <option value="5">매월 5일</option>
+            <option value="6">매월 6일</option>
+            <option value="7">매월 7일</option>
+            <option value="8">매월 8일</option>
+            <option value="9">매월 9일</option>
+            <option value="10">매월 10일</option>
+            <option value="11">매월 11일</option>
+            <option value="12">매월 12일</option>
+            <option value="13">매월 13일</option>
+            <option value="14">매월 14일</option>
+            <option value="15">매월 15일</option>
+            <option value="16">매월 16일</option>
+            <option value="17">매월 17일</option>
+            <option value="18">매월 18일</option>
+            <option value="19">매월 19일</option>
+            <option value="20">매월 20일</option>
+            <option value="21">매월 21일</option>
+            <option value="22">매월 22일</option>
+            <option value="23">매월 23일</option>
+            <option value="24">매월 24일</option>
+            <option value="25">매월 25일</option>
+            <option value="26">매월 26일</option>
+            <option value="27">매월 27일</option>
+            <option value="28">매월 28일</option>
+            <option value="100">매월 말일</option>
+            <!-- TODO: 말일 처리. 급여 계산 시작일 필요 -->
+        </select>
+        <small class="invalid-feedback text-danger" id="sallary_day_feedback"></small>
+    </div>  
+</div>
+<div class="row form-group" id="net_container">
+    <div class="col-md-2">
+        <label for="net" class="text-primary">NET 여부 *</label>
+        <select name="net" id="net" class="form-control">
+            <option value="1">O</option>
+            <option value="0">X</option>
+        </select>
+    </div>  
+    <div class="col-md-10">
+        <label for="net_desc" class="text-primary"> </label>
+        <input id="net_desc" name="net_desc" type="text" class="form-control" placeholder="" readonly>
+    </div>  
+</div>
+<div class="row form-group" id="over5_gamdan_container">
+    <div class="col-md-2">
+        <label for="over5" class="text-primary">5인 사업장 여부 *</label>
+        <select name="over5" id="over5" class="form-control">
+            <option value="0">X</option>
+            <option value="1">O</option>
+        </select>
+    </div>  
+    <div class="col-md-2">
+        <label for="gamdan" class="text-primary">감단 여부 *</label>
+        <select name="gamdan" id="gamdan" class="form-control">
+            <option value="0">X</option>
+            <option value="1">O</option>
+        </select>
+    </div>  
+</div>
+<div class="row form-group" id="fired_reason_container">
+    <div class="col-md-12">
+        <label for="fired_reason">계약해지 추가조항</label>
+        <textarea id="fired_reason" name="fired_reason" type="text" class="form-control" placeholder=""></textarea>
+    </div>  
+</div>
+<div class="row form-group" id="inclusive_wage_container">
+    <div class="col-md-2">
+        <label for="inclusive_wage" class="text-primary">포괄산정 여부 *</label>
+        <select name="inclusive_wage" id="inclusive_wage" class="form-control">
+            <option value="0">X</option>
+            <option value="1">O</option>
+        </select>
+    </div>  
+</div>
+<div class="row form-group hidden" id="inclusive_wage_inputs">
+    <div class="col-md-2">
+        <label for="benefit_over" class="text-normal">약정연장수당(시간)</label>
+        <input id="benefit_over" name="benefit_over" type="number" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="benefit_over_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="benefit_night" class="text-normal">약정야간수당(시간)</label>
+        <input id="benefit_night" name="benefit_night" type="number" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="benefit_night_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="benefit_holiday" class="text-normal">약정휴일수당(시간)</label>
+        <input id="benefit_holiday" name="benefit_holiday" type="number" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id=benefit_holiday_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="benefit_over_holiday" class="text-normal">약정휴일연장수당(시간)</label>
+        <input id="benefit_over_holiday" name="benefit_over_holiday" type="number" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="benefit_over_holiday_feedback"></small>
+    </div>  
+</div>
+<div class="row form-group" id="working_schedule_container">
+    <div class="col-md-2">
+        <label for="working_schedule" class="text-primary">근무타입 *</label>
+        <select name="working_schedule" id="working_schedule" class="form-control">
+            <option value="0">일반</option>
+            <option value="1">격주</option>
+            <option value="2">근무표에 따라 변경</option>
+            <option value="3">교대</option>
+        </select>
+    </div>  
+    <div class="col-md-4">
+        <label for="offday_for_sheet" class="text-primary">주휴일 *</label>
+        <select name="offday_for_sheet" id="offday_for_sheet" class="form-control">
+            <option value="0">근무표에 따라 변경</option>
+            <option value="1">월요일</option>
+            <option value="2">화요일</option>
+            <option value="3">수요일</option>
+            <option value="4">목요일</option>
+            <option value="5">금요일</option>
+            <option value="6">토요일</option>
+            <option value="7">일요일</option>
+        </select>
+    </div>  
+    <div class="col-md-2" id="off_per_month_container">
+        <label for="off_per_month">월 OFF 갯수</label>
+        <input id="off_per_month" name="off_per_month" type="number" max="31" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="off_per_month_feedback"></small>
+    </div>
+    <input type="hidden" id="worker_id" name="worker_id" value="">
+</div>
+<div class="row form-group sep-top-line hidden" id="daily_schedule">
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_mon" name="daily_mon">
+            <span>월요일</span>
+        </label>
+    </div>
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_tue" name="daily_tue">
+            <span>화요일</span>
+        </label>
+    </div>
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_wed" name="daily_wed">
+            <span>수요일</span>
+        </label>
+    </div>
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_thu" name="daily_thu">
+            <span>목요일</span>
+        </label>
+    </div>
+</div>
+<div class="row form-group hidden" id="daily_schedule2">
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_fri" name="daily_fri">
+            <span>금요일</span>
+        </label>
+    </div>
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_sat" name="daily_sat">
+            <span>토요일</span>
+        </label>
+    </div>
+    <div class="col-md-2">
+        <label class="fancy-checkbox element-left">
+            <input type="checkbox" id="daily_sun" name="daily_sun">
+            <span>일요일</span>
+        </label>
+    </div>
+</div>

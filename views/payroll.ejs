@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head' , { title: "" } ) %>
+
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <h1 class="text-center text-center">
+                        <%=data.payroll.title%>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td class="text-center" rowspan="6" style="width:50%; text-align: center; vertical-align: middle;">
+                                <h2><%=data.item.company_name%></h2>
+                            </td>
+                            <td class="text-left" style="width:20%;">지 급 일</td>
+                            <td><%=data.item.sallary_day%>일</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">직   무</td>
+                            <td><%=data.item.part%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">성   명</td>
+                            <td><%=data.item.name%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">생년월일</td>
+                            <td><%=data.item.idcardNumber%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">입 사 일</td>
+                            <td><%=data.item.entered%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">퇴 사 일</td>
+                            <td><%=data.item.resigned%></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th class="text-center" colspan="2" style="width:50%;">지급항목</th>
+                            <th class="text-center" colspan="2" style="width:50%;">공제항목</th>
+                        </tr>
+                        <tr>
+                            <th class="text-left" style="width:20%;">기본급</th>
+                            <td class="text-right"><%=data.calc.realSallaryString%></td>
+                            <td class="text-left" style="width:20%;">갑근세</td>
+                            <td class="text-right"><%=data.payroll.income_tax%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">약정연장 근로수당</td>
+                            <td class="text-right"><%=data.calc.overDurationMoneyString%></td>
+                            <td class="text-left" style="width:20%;">주민세</td>
+                            <td class="text-right"><%=data.payroll.resident_tax%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">약정야간 근로수당</td>
+                            <td class="text-right"><%=data.calc.nightDurationMoneyString%></td>
+                            <td class="text-left" style="width:20%;">고용보험</td>
+                            <td class="text-right"><%=data.payroll.employment_insurance%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">약정휴일 근로수당</td>
+                            <td class="text-right"><%=data.calc.holidayDurationMoneyString%></td>
+                            <td class="text-left" style="width:20%;">건강보험</td>
+                            <td class="text-right"><%=data.payroll.health_insurance%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">휴일연장 근로수당</td>
+                            <td class="text-right"><%=data.calc.holidayOverDurationMoneyString%></td>
+                            <td class="text-left" style="width:20%;">장기요양</td>
+                            <td class="text-right"><%=data.payroll.care_insurance%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">연차수당</td>
+                            <td class="text-right"><%=data.calc.yearOffMoneyString%></td>
+                            <td class="text-left" style="width:20%;">국민연금</td>
+                            <td class="text-right"><%=data.payroll.national_pension%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">직책수당</td>
+                            <td class="text-right"><%=data.calc.positionMoneyString%></td>
+                            <td class="text-left" style="width:20%;">건강보험 정산</td>
+                            <td class="text-right"><%=data.payroll.health_insurance_calculate%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">육아수당</td>
+                            <td class="text-right"><%=data.calc.babyMoneyString%></td>
+                            <td class="text-left" style="width:20%;">장기요양 정산</td>
+                            <td class="text-right"><%=data.payroll.care_insurance_calculate%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">식대</td>
+                            <td class="text-right"><%=data.calc.foodMoneyString%></td>
+                            <td class="text-left" style="width:20%;">고용보험지원금</td>
+                            <td class="text-right"><%=data.payroll.employment_insurance_support%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">차량유지비</td>
+                            <td class="text-right"><%=data.calc.carMoneyString%></td>
+                            <td class="text-left" style="width:20%;">국민연금 지원금</td>
+                            <td class="text-right"><%=data.payroll.national_pension_support%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;">경영성과금</td>
+                            <td class="text-right"><%=data.payroll.benefit%></td>
+                            <td class="text-left" style="width:20%;">연말정산 건강보험</td>
+                            <td class="text-right"><%=data.payroll.year_calcurate_health_insurance%></td>
+                        </tr>
+                        <tr>
+                            <th class="text-left" style="width:20%;">공제액(결근 등)</th>
+                            <td class="text-right"><%=data.payroll.minus_moey%></td>
+                            <td class="text-left" style="width:20%;">연말정산 장기요양</td>
+                            <td class="text-right"><%=data.payroll.year_calcurate_care_insurance%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;"></td>
+                            <td class="text-right"></td>
+                            <td class="text-left" style="width:20%;">기타공제</td>
+                            <td class="text-right"><%=data.payroll.etc_minus_money%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="width:20%;"></td>
+                            <td class="text-right"></td>
+                            <th class="text-center" style="width:20%;">지급총액</th>
+                            <th class="text-right"><%=data.payroll.totalPayed%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="width:20%;"></td>
+                            <td class="text-right"></td>
+                            <th class="text-center" style="width:20%;">공제총액</th>
+                            <th class="text-right"><%=data.payroll.totalMinus%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="width:20%;"></td>
+                            <td class="text-right"></td>
+                            <th class="text-center" style="width:20%;">실수령액</th>
+                            <th class="text-right"><%=data.payroll.totalReceived%></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th class="text-center" style="width:20%;" colspan="2">통상시급</th>
+                            <th class="text-right" colspan="2"><%=data.calc.baseMoneyString%></th>
+                            <td class="text-center" colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:10%;text-align: center; vertical-align: middle;" rowspan="2">항목별<br>근무시간</th>
+                            <th class="text-center" style="width:10%;">약정연장<br>근로수당</th>
+                            <th class="text-center" style="width:10%;">약정야간<br>근로수당</th>
+                            <th class="text-center" style="width:10%;">약정휴일<br>근로수당</th>
+                            <th class="text-center" style="width:10%;">휴일연장<br>근로수당</th>
+                            <th class="text-center" style="width:10%;text-align: center; vertical-align: middle;">연차</th>
+                            <th class="text-center" style="width:10%;text-align: center; vertical-align: middle;">기본급</th>
+                            <th class="text-center" style="width:10%;text-align: center; vertical-align: middle;">공제일 수</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="width:10%;"><%=data.calc.overDuration%></td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.nightDuration%></td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.holidayDuration%></td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.holidayOverDuration%></td>
+                            <td class="text-center" style="width:10%;text-align: center; vertical-align: middle;"><%=data.calc.yearOffMoneyString%></td>
+                            <td class="text-center" style="width:10%;text-align: center; vertical-align: middle;"><%=data.calc.baseDuration%></td>
+                            <td class="text-center" style="width:10%;text-align: center; vertical-align: middle;"><%=data.payroll.minus_time%></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td class="text-center" style="width:20%;" colspan="8">계산방법</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="width:20%;text-align: center; vertical-align: middle;" colspan="2">구분</td>
+                            <td class="text-left" style="width:40%;" colspan="4">산출식 또는 산출방법(중도 입/퇴사자 고정급 일할계산)</td>
+                            <th class="text-center" style="width:10%;">근로시간</th>
+                            <th class="text-center" style="width:10%;">지급액</th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">기본급</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.calc.baseDuration%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.baseDuration%></td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.realSallaryString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">약정연장 근로수당</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.calc.overDuration%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.overDuration%></td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.overDurationMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">약정야간 근로수당</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.calc.nightDuration%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.nightDuration%></td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.nightDurationMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">약정휴일 근로수당</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.calc.holidayDuration%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.holidayDuration%></td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.holidayDurationMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">휴일연장 근로수당</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.calc.holidayOverDuration%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.calc.holidayOverDuration%></td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.holidayOverDurationMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">연차수당</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.payroll.offday_per_year_time%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.payroll.offday_per_year_time%></td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.yearOffMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:70%;" colspan="7">직책수당</td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.positionMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:70%;" colspan="7">육아수당</td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.babyMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:70%;" colspan="7">식대</td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.foodMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:70%;" colspan="7">차량유지비</td>
+                            <th class="text-right" style="width:10%;"><%=data.calc.carMoneyString%></th>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:70%;" colspan="7">경영성과금</td>
+                            <th class="text-right" style="width:10%;"><%=data.payroll.benefit%></th>
+                        </tr>
+                            <td class="text-left" style="width:20%;" colspan="2">공제액(결근 등)</td>
+                            <td class="text-left" style="width:40%;" colspan="4">[<%=data.payroll.minus_time%>]시간 * 통상시급</td>
+                            <td class="text-center" style="width:10%;"><%=data.payroll.minus_time%></td>
+                            <th class="text-right" style="width:10%;"><%=data.payroll.minus_moey%></th>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:60%;" colspan="6">총 근로시간 및 지급총액</th>
+                            <td class="text-center" style="width:10%;"><%=data.payroll.totalTime%></td>
+                            <th class="text-right" style="width:10%;"><%=data.payroll.totalPayed%></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">근로소득세</td>
+                            <td class="text-left" style="width:60%;" colspan="6">근로소득간이세액표 기준</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">고용보험</td>
+                            <td class="text-left" style="width:60%;" colspan="6">월평균 보수월액 * 0.8% (원단위 절삭)</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">건강보험</td>
+                            <td class="text-left" style="width:60%;" colspan="6">월평균 보수월액 * 3.43% (원단위 절삭)</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">장기요양</td>
+                            <td class="text-left" style="width:60%;" colspan="6">건강보험 * 11.52% (원단위 절삭)</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left" style="width:20%;" colspan="2">국민연금</td>
+                            <td class="text-left" style="width:60%;" colspan="6">월평균 소득월액 * 4.5% (원단위 절삭_21.07-22.06 적용 상한액 524만원)</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="text-center text-center">
+                    귀하의 노고에 진심으로 감사 드립니다.
+                </h4>
+            </div>
+        </div>
+
+    </body>
+</html>

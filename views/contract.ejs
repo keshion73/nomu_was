@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head' , { title: "" } ) %>
+
+    <body>
+        <div class="container-fluid">
+            <h1 class="text-center text-center">
+                근로계약서
+            </h1>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td class="text-center" rowspan="2">사용자<br>甲</td>
+                            <td class="text-center">회사명</td>
+                            <td><%=data.item.company_name%></td>
+                            <td class="text-center">대 표</td>
+                            <td><%=data.item.boss_name%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">주 소</td>
+                            <td colspan="3">(<%=data.item.company_post_no%>) <%=data.item.company_address%> <%=data.item.company_address_detail%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" rowspan="2">근로자<br>乙</td>
+                            <td class="text-center">성 명</td>
+                            <td><%=data.item.name%></td>
+                            <td class="text-center">주민번호</td>
+                            <td><%=data.item.idcardNumber%></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">주 소</td>
+                            <td colspan="3">(<%=data.item.postNo%>) <%=data.item.address%> <%=data.item.addressDetail%></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제1조【목적】</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>甲은 본 계약이 정하는 제<% if ( data.item.internship == 0 ) { %>4<% } else { %>3<%} %>조의 업무수행을 위하여 乙을 고용한다.</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제2조【계약기간】</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>근로계약의 기간은 <%=data.item.formatted_start_date%> 부터 <% if ( data.item.formatted_end_date === null ) { %>취업규칙에서 정한 정년<% } else { %><%= data.item.formatted_end_date%><% } %>까지로 한다.</span>
+                </div>
+            </div>
+            <% if ( data.item.internship == 1 ) { %>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제3조【수습】</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>수습기간은 <%= data.item.internship_duration %>개월로 하고 수습기간중 임금은 최저임금의 <%= data.item.internship_percent %>%를 지급할수 있으며 수습기간중 업무 습득이 현저히 떨어질 경우 본채용을 거부 할 수 있다.</span>
+                </div>
+            </div>
+            <%} %>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제<% if ( data.item.internship == 1 ) { %>4<% } else { %>3<%} %>조【근로부서 및 직무】 </h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>乙의 근무장소는 <%=data.item.workedOn%> 이며 <%=data.item.part%> 관련 업무를 한다.<br>단, 甲의 사업에 여건상 필요하다고 인정될 경우에는 乙과 협의하여 전환 배치 할 수 있으며 乙은 이에 따라야 한다.</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제<% if ( data.item.internship == 1 ) { %>5<% } else { %>4<%} %>조【근로시간 및 휴게시간】  </h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>근로시간은 일일8시간, 일주40시간 이며 휴게시간은 4시간당 30분을 원칙으로 한다.<br>
+                        ① 乙의 근로시간은 <%= data.scheduleObject.scheduleString %>로 한다<br>
+                        ② 甲은 사업상 필요에 따라 제1항의 근무시간 외에 연장 · 야간 · 휴일근로를 乙에게 지시할 수 있고, 이 경우 乙은  합리적인 특별한 사유가 없는한 이에 따라야 한다.</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제<% if ( data.item.internship == 1 ) { %>6<% } else { %>5<%} %>조【임금】</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>① 乙의 연봉은 다음과 같으며, 甲은 매월 1일부터 말일까지의 아래의 월 급여를 <%=data.item.sallary_day%>일에 乙의 급여 계좌로 지급한다.</span>
+                    <% if ( data.item.inclusive_wage == 1 ) { %>
+                    <span>② 위 총액에는 포괄임금산정제에 의해 기본연봉, 법정 제수당 등이 모두 포함되어 있으며 乙은 이에 동의한다.</span>
+                    <% } %>
+                </div>
+            </div>
+            <div class="row" style="margin-top:30px;">
+                <% if ( data.item.inclusive_wage == 1 ) { %>
+                <div class="col-md-12 text-right">
+                    <p style="display:inline-block">포괄산정 동의</p><div style="display:inline-block" class="sign-bottom-line"></div><p style="display:inline-block">(서명/인)</p>
+                </div>
+                <% } %>
+            </div>
+            <div class="row" <% if ( data.item.inclusive_wage == 1 ) { %> style="margin-top:30px;" <% } %>>
+                <div class="col-md-12">
+                    <table class="table table-bordered" style="width:22.2%" style="margin-bottom: 0px;">
+                        <tbody>
+                        <tr>
+                            <th class="text-center">통상시급</td>
+                            <td class="text-right"><%=data.calc.baseMoneyString%></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered">
+                        <thead>
+                            <th class="text-center" style="width:11.1%">구성항목</th>
+                            <th class="text-center" style="width:16.2%">기본급</th>
+                            <th class="text-center" style="width:12.1%">식대</th>
+                            <th class="text-center" style="width:12.1%">차량유지비</th>
+                            <th class="text-center" style="width:12.1%">육아수당</th>
+                            <th class="text-center" style="width:12.1%">직책수당</th>
+                            <th class="text-center" style="width:12.1%">자격수당</th>
+                            <th class="text-center" style="width:12.1%">기타제수당</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th class="text-center">금액</th>
+                            <td class="text-right"><%=data.calc.realSallaryString%></td>
+                            <td class="text-right"><%=data.calc.foodMoneyString%></td>
+                            <td class="text-right"><%=data.calc.carMoneyString%></td>
+                            <td class="text-right"><%=data.calc.babyMoneyString%></td>
+                            <td class="text-right"><%=data.calc.positionMoneyString%></td>
+                            <td class="text-right"><%=data.calc.certMoneyString%></td>
+                            <td class="text-right"><%=data.calc.etcMoneyString%></td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">근로시간</td>
+                            <td class="text-right"><%=data.calc.baseDuration%></td>
+                            <td class="text-right"></td>
+                            <td class="text-right"></td>
+                            <td class="text-right"></td>
+                            <td class="text-right"></td>
+                            <td class="text-right"></td>
+                            <td class="text-right"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-12">
+                    <span>가산 수당 항목</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th class="text-center" style="width:11.1%">구성항목</th>
+                                <th class="text-center" style="width:12.1%">연장수당</th>
+                                <th class="text-center" style="width:12.1%">야간수당</th>
+                                <th class="text-center" style="width:12.1%">휴일수당</th>
+                                <th class="text-center" style="width:12.1%">휴일연장</th>
+                                <th class="text-center" style="width:12.1%">연차수당</th>
+                                <th class="text-center">월급여 총액</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">금액</th>
+                                <td class="text-right"><%=data.calc.overDurationMoneyString%></td>
+                                <td class="text-right"><%=data.calc.nightDurationMoneyString%></td>
+                                <td class="text-right"><%=data.calc.holidayDurationMoneyString%></td>
+                                <td class="text-right"><%=data.calc.holidayOverDurationMoneyString%></td>
+                                <td class="text-right"><%=data.calc.yearOffMoneyString%></td>
+                                <td class="text-right"><%=data.calc.totalMoneyString%></th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">근로시간</td>
+                                <td class="text-right"><%=data.calc.overDuration%></td>
+                                <td class="text-right"><%=data.calc.nightDuration%></td>
+                                <td class="text-right"><%=data.calc.holidayDuration%></td>
+                                <td class="text-right"><%=data.calc.holidayOverDuration%></td>
+                                <td class="text-right"></th>
+                                <td class="text-right"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <% if ( data.item.net == 1 ) { %>
+                    <span><% if ( data.item.inclusive_wage == 1 ) { %>③<% } else { %>②<%} %> 乙의 급여액중 乙이 부담하여야 할 세금 및 사회보험료 등은 甲이 지원한다.</span>
+                    <% } else { %>
+                    <span>③ 乙의 실제 급여액은 세금및 사회보험료 등을 공제한 금액으로 한다.</span>
+                    <% } %>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span><% if ( data.item.inclusive_wage == 1 ) { %>④<% } else { %>③<%} %> 乙의 지각, 조퇴, 결근 등으로 근로제공 의무의 불이행이 발생하였을 경우 갑은 불이행 시간에 대한 임금을 월급여에서 공제할 수 있다.</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제<% if ( data.item.internship == 1 ) { %>7<% } else { %>6<%} %>조 【휴일 및 휴가】 </h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>① 1주일의 소정근로를 만근한 경우 1일의 유급휴일을 부여하며,
+                        <%= data.calc.offString %> <br>
+                        ② 연차휴가는 근로기준법 따른다.<br>
+                        ③ 매년 5월1일 근로자의날<br></span>
+                        <% if ( data.item.evenOver5 == 1 || data.item.gamdan == 1 ) { %>
+                        <span>④ 기타 법령 또는 노동법령에서 정한 휴일</span>
+                        <% } %>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제<% if ( data.item.internship == 1 ) { %>8<% } else { %>7<%} %>조【계약의 해지】 </h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>①  甲은 다음 각 호의 사유가 발생하는 경우 乙을 해고할 수 있다.<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. 乙이 업무상 고의 또는 중대한 과실로 甲에게 손해를 끼쳤을 때<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. 도박, 음주소란행위 및 풍기문제등으로 사업장내의 규율과 질서를 문란케 하였을 때<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. 기타 취업규칙에 규정된 징계사유 및 사회통념상 근로관계를 유지하기 어려운 사유가 발생하였을 때<br>
+                        ② 乙이 업무상 고의 또는 중대한 과실로 甲에게 손해를 끼쳤을 때는 이를 배상해야 한다.<br></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 style="margin-top:30px;">제<% if ( data.item.internship == 1 ) { %>9<% } else { %>8<%} %>조【기타】 </h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>① 이 계약에 정함이 없는 사항은 노동관계법령 및 취업규칙에 의한다.<br>
+                        ② 갑과 을은 이상의 계약내용을 명확히 하기 위하여 본 계약서 2부를 작성하여 각각 날인(서명)한 후 1부씩 보관한다.<br></span>
+                        <% if ( data.item.option_description != null && data.item.option_description !== '' ) { %>
+                        <span>③ <%=data.item.option_description%> </span>
+                        <% } %>
+                </div>
+            </div>
+            <div class="row" style="margin-top:30px;">
+                <div class="col-md-12 text-right">
+                    <p style="display:inline-block">교부확인</p><div style="display:inline-block" class="sign-bottom-line"></div><p style="display:inline-block">(서명/인)</p>
+                </div>
+            </div>
+            <h4 style="margin-top:30px;" class="text-center text-center">
+                <%=data.item.formatted_writing_date%>
+            </h4>
+            <div class="row" style="margin-top:30px;">
+                <div class="col-md-7">
+                    <h3>(갑)</h3>
+                    <p>주소 : (<%=data.item.company_post_no%>) <%=data.item.company_address%> <%=data.item.company_address_detail%></p>
+                    <p>사업자등록번호 : <%=data.item.business_number%></p>
+                    <div>
+                        <p style="display:inline-block"><%=data.item.company_name%></p><div style="display:inline-block" class="sign-bottom-line"></div><p style="display:inline-block">(인)</p>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <h3>(을)</h3>
+                    <p>주소 : (<%=data.item.postNo%>) <%=data.item.address%> <%=data.item.addressDetail%></p>
+                    <p>주민등록번호 : <%=data.item.idcardNumber%></p>
+                    <div>
+                        <p style="display:inline-block">성     명</p><div style="display:inline-block" class="sign-bottom-line"></div><p style="display:inline-block">(인)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>

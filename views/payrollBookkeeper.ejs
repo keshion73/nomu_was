@@ -1,0 +1,1618 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head' , { title: "" } ) %>
+
+    <body>
+        <div class="main-content">
+            <div class="container-fluid">
+                <h3 class="page-title">
+                    임금대장
+                </h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="">
+                            <button type="button" class="btn btn-primary btn-excel"
+                                onclick="javascript:uploadExcelButton()"><i class="fa fa-upload"></i> 엑셀 입력하기</button>
+                            <button type="button" class="btn btn-success btn-excel" download
+                                onclick="javascript:downloadExcel()"><i class="fa fa-download"></i> 엑셀 다운로드</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- PANEL DEFAULT -->
+                        <div id="detailPanel" class="panel hidden">
+                            <div class="panel-heading">
+                                <div class="right">
+                                    <button type="button" id="payrollPanel" class="btn-toggle-collapse"><i
+                                            class="lnr lnr-chevron-up"></i></button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="modal-body">
+                                    <!-- <h3 class="page-title">업체 정보</h3> -->
+                                    <form class="container-fluid" id="workerForm" action="join" method="POST">
+                                        <div class="panel-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-2">
+                                                    <label for="name" class="text-primary">이름</label>
+                                                    <input id="name" name="name" type="text" class="form-control"
+                                                        placeholder="성명" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="name_feedback"></small>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="idcard_number" class="text-primary">주민번호</label>
+                                                    <input name="idcard_number" id="idcard_number" type="text"
+                                                        class="form-control" placeholder="주민 번호" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="idcard_number_feedback"></small>
+                                                </div>
+                                                <div class="col-md-2 hidden">
+                                                    <label for="contract_type" class="text-primary">계약형태</label>
+                                                    <input name="contract_type" id="contract_type" type="text"
+                                                        class="form-control" placeholder="계약형태" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="contract_type_feedback"></small>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="part" class="text-primary">직무</label>
+                                                    <input id="part" name="part" type="text" class="form-control"
+                                                        placeholder="직무" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="part_feedback"></small>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="position" class="text-primary">직급</label>
+                                                    <input id="position" name="position" type="text"
+                                                        class="form-control" placeholder="직급" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="position_feedback"></small>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="worked_on" class="text-primary">근로장소</label>
+                                                    <input id="worked_on" name="worked_on" type="text"
+                                                        class="form-control" placeholder="근무장소" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="worked_on_feedback"></small>
+                                                </div>
+                                            </div>
+                                            <div class="row form-group">
+                                                <div class="col-md-2">
+                                                    <label for="entered" class="text-primary">입사일</labely>
+                                                        <input id="entered" name="entered" type="text"
+                                                            class="form-control" placeholder="입사일" readonly>
+                                                        <small class="invalid-feedback text-danger"
+                                                            id="entered_feedback"></small>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="resigned">퇴사일</label>
+                                                    <input id="resigned" name="resigned" type="text"
+                                                        class="form-control" placeholder="퇴사일" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="resigned_feedback"></small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="email" class="text-primary">이메일</label>
+                                                    <input id="email" name="email" type="text" class="form-control"
+                                                        placeholder="이메일" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="email_feedback"></small>
+                                                </div>
+                                            </div>
+                                            <div class="row form-group">
+                                                <div class="col-md-4">
+                                                    <label for="post_no" class="text-primary">주소</label>
+                                                    <input id="post_no" name="post_no" type="text" class="form-control"
+                                                        placeholder="우편번호" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="row form-group">
+                                                <div class="col-md-12">
+                                                    <input id="address" name="address" type="text" class="form-control"
+                                                        placeholder="주소" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="row form-group">
+                                                <div class="col-md-12">
+                                                    <input onkeyup="javascript:validateAddress()" id="address_detail"
+                                                        name="address_detail" type="text" class="form-control"
+                                                        placeholder="상세주소" readonly>
+                                                    <small class="invalid-feedback text-danger"
+                                                        id="address_feedback"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="contract_normal">
+                                            <div class="panel-body">
+                                                <div class="row form-group">
+                                                    <div class="col-md-12">
+                                                        <div class="">
+                                                            <button type="button" class="btn btn-excel"
+                                                                onclick="javascript:putContractCalc()"><i
+                                                                    class="fa fa-pencil"></i> 계약서 계산값 불러오기</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="contract_type_container">
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="working_days" class="text-primary">근무일수
+                                                                *</label>
+                                                            <input id="working_days" name="working_days" type="number"
+                                                                class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="working_days_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="sallary" class="text-primary">월급여</label>
+                                                            <input id="sallary" name="sallary" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="sallary_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="basic_time" class="text-primary">기본근로시간
+                                                                *</label>
+                                                            <input id="basic_time" name="basic_time" type="number"
+                                                                class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="basic_time_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="delayed_time"
+                                                                class="text-primary">연장근로시간</label>
+                                                            <input id="delayed_time" name="delayed_time" type="number"
+                                                                class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="delayed_time_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="night_time" class="text-primary">야간근로시간</label>
+                                                            <input id="night_time" name="night_time" type="number"
+                                                                class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="night_time_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="holiday_time"
+                                                                class="text-primary">휴일근로시간</label>
+                                                            <input id="holiday_time" name="holiday_time" type="number"
+                                                                class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="holiday_time_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="holiday_delayed_time"
+                                                                class="text-primary">휴일연장근로시간</label>
+                                                            <input id="holiday_delayed_time" name="holiday_delayed_time"
+                                                                type="number" class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="holiday_delayed_time_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="offday_per_year_time"
+                                                                class="text-primary">연차시간</label>
+                                                            <input id="offday_per_year_time" name="offday_per_year_time"
+                                                                type="number" class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="offday_per_year_time_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="minus_time" class="text-primary">공제시간</label>
+                                                            <input id="minus_time" name="minus_time" type="number"
+                                                                class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="minus_time_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="realSallary" class="text-primary">기본급</label>
+                                                            <input id="realSallary" name="realSallary" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="overDurationMoney"
+                                                                class="text-primary">약정연장근로수당</label>
+                                                            <input id="overDurationMoney" name="overDurationMoney"
+                                                                type="text" class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="nightDurationMoney"
+                                                                class="text-primary">약정야간근로수당</label>
+                                                            <input id="nightDurationMoney" name="nightDurationMoney"
+                                                                type="text" class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="holidayDurationMoney"
+                                                                class="text-primary">약정휴일근로수당</label>
+                                                            <input id="holidayDurationMoney" name="holidayDurationMoney"
+                                                                type="text" class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="holidayOverDurationMoney"
+                                                                class="text-primary">휴일연장근로수당</label>
+                                                            <input id="holidayOverDurationMoney"
+                                                                name="holidayOverDurationMoney" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="yearOffMoney" class="text-primary">연차수당</label>
+                                                            <input id="yearOffMoney" name="yearOffMoney" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="positionMoney" class="text-primary">직책수당</label>
+                                                            <input id="positionMoney" name="positionMoney" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="babyMoney" class="text-primary">육아수당</label>
+                                                            <input id="babyMoney" name="babyMoney" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="foodMoney" class="text-primary">식대</label>
+                                                            <input id="foodMoney" name="foodMoney" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="carMoney" class="text-primary">차량유지비</label>
+                                                            <input id="carMoney" name="carMoney" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="benefit" class="text-primary">경영성과급</label>
+                                                            <input id="benefit" name="benefit" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="benefit_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="minus_moey" class="text-primary">공제액</label>
+                                                            <input id="minus_moey" name="minus_moey" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="minus_moey_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="employment_insurance"
+                                                                class="text-normal">고용보험</label>
+                                                            <input id="employment_insurance" name="employment_insurance"
+                                                                type="text" class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="employment_insurance_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="health_insurance"
+                                                                class="text-normal">건강보험</label>
+                                                            <input id="health_insurance" name="health_insurance"
+                                                                type="text" class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="health_insurance_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="care_insurance" class="text-normal">장기요양</label>
+                                                            <input id="care_insurance" name="care_insurance" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="care_insurance_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="national_pension"
+                                                                class="text-normal">국민연금</label>
+                                                            <input id="national_pension" name="national_pension"
+                                                                type="text" class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="national_pension_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="health_insurance_calculate"
+                                                                class="text-normal">건강보험정산</label>
+                                                            <input id="health_insurance_calculate"
+                                                                name="health_insurance_calculate" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="health_insurance_calculate_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="care_insurance_calculate"
+                                                                class="text-normal">요양보험정산</label>
+                                                            <input id="care_insurance_calculate"
+                                                                name="care_insurance_calculate" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="care_insurance_calculate_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="income_tax" class="text-normal">갑근세</label>
+                                                            <input id="income_tax" name="income_tax" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="income_tax_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="resident_tax" class="text-normal">주민세</label>
+                                                            <input id="resident_tax" name="resident_tax" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="resident_tax_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="employment_insurance_support"
+                                                                class="text-normal">고용보험지원</label>
+                                                            <input id="employment_insurance_support"
+                                                                name="employment_insurance_support" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="employment_insurance_support_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="national_pension_support"
+                                                                class="text-normal">국민연금지원</label>
+                                                            <input id="national_pension_support"
+                                                                name="national_pension_support" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="national_pension_support_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="year_calcurate_income_tax"
+                                                                class="text-normal">연말정산 갑근세</label>
+                                                            <input id="year_calcurate_income_tax"
+                                                                name="year_calcurate_income_tax" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="year_calcurate_income_tax_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="year_calcurate_resident_tax"
+                                                                class="text-normal">연말정산 주민세</label>
+                                                            <input id="year_calcurate_resident_tax"
+                                                                name="year_calcurate_resident_tax" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="year_calcurate_resident_tax_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="year_calcurate_health_insurance"
+                                                                class="text-normal">연말정산건강보험</label>
+                                                            <input id="year_calcurate_health_insurance"
+                                                                name="year_calcurate_health_insurance" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="year_calcurate_health_insurance_feedback"></small>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="year_calcurate_care_insurance"
+                                                                class="text-normal">연말정산장기요양</label>
+                                                            <input id="year_calcurate_care_insurance"
+                                                                name="year_calcurate_care_insurance" type="text"
+                                                                class="form-control" placeholder=""
+                                                                onFocusOut="removeChar(event);inputNumberFormat(this);"
+                                                                onKeyUp="removeChar(event, this);inputNumberFormat(this);"
+                                                                onKeyDown="inputNumberFormat(this);">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="year_calcurate_care_insurance_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-2">
+                                                            <label for="etc_minus_money"
+                                                                class="text-normal">기타공제</label>
+                                                            <input id="etc_minus_money" name="etc_minus_money"
+                                                                type="number" class="form-control" placeholder="">
+                                                            <small class="invalid-feedback text-danger"
+                                                                id="etc_minus_money_feedback"></small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-12">
+                                                    <small class="text-primary">* 표기된 항목은 필수 입력 항목입니다.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input id="worker_id" name="worker_id" type="hidden">
+                                        <input id="contract_id" name="contract_id" type="hidden">
+                                        <input id="payroll_id" name="payroll_id" type="hidden">
+                                        <input id="total_working_days" name="total_working_days" type="hidden">
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="panel-footer panel-footer-right form-inline">
+                                <button type="button" class="btn btn-primary" onclick="javascript:doEdit()">수정</button>
+                                <button type="button" class="btn" onclick="javascript:cancelEdit()">취소</button>
+                            </div>
+                        </div>
+                        <!-- END PANEL DEFAULT -->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <table class="table table-striped" id="table" data-paging-position="right">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include( 'spinner' ) %>
+        </div>
+        <form id="excelForm" action="uploadWorkerExcel" method="POST">
+            <input type="file" id="excel" name="excel" class="hidden"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                onchange="javascript:uploadExcel()" />
+        </form>
+    </body>
+
+    <!-- Javascript -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/vendor/footable/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Add in any FooTable dependencies we may need -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+    <script src="assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="assets/scripts/klorofil-common.js"></script>
+    <script src="assets/scripts/nomu-common.js"></script>
+    <!-- FOO TABLE 필요시 모듈화 -->
+    <script src="assets/vendor/footable/js/footable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+        integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js"
+        integrity="sha512-L4qpL1ZotXZLLe8Oo0ZyHrj/SweV7CieswUODAAPN/tnqN3PA1P+4qPu5vIryNor6HQ5o22NujIcAZIfyVXwbQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <%- include( 'payrollListDataTableScript' ) %>
+        <script>
+            let table = {}
+
+            jQuery(function ($) {
+                table = FooTable.init('#table', payrollTableSetting)
+                reloadPayrollTable(table, setData)
+
+                hidePanelOnStart($('#payrollPanel'))
+                $('#detailPanel').toggleClass('hidden')
+            });
+
+            function setData(table, list) {
+                list.map((item) => {
+
+                    //alert( JSON.stringify(item) )
+
+                    item.nameTag = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:editPayroll(" + item.payroll_id + ", " + item.worker_id + ")'>" + item.name + "<span class='caret'></span></a>\
+                    "
+
+                    item.preview = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:previewPayroll(" + item.payroll_id + ",\"" + (item.payroll_pdf_uri ? item.payroll_pdf_uri : "") + "\")'>급여명세서보기<span class='caret'></span></a>\
+                    "
+
+                    switch (item.contractType) {
+                        case 0:
+                            item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.normal) %>'
+                            break
+                        case 1:
+                            item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.duration) %>'
+                            break
+                        case 2:
+                            item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.daily) %>'
+                            break
+                        default:
+                            item.constract_type_string = '셀프작성'
+                            break
+                    }
+
+                    if (item.completed === null || item.completed == 0) {
+                        item.completed_string = "<a class='text-danger' href='javascript:editPayroll(" + item.payroll_id + ", " + item.worker_id + ")'>" + "입력 필요" + "<span class='caret'></span></a>"
+                    } else {
+                        item.completed_string = "입력 완료"
+                    }
+
+                    item.sendMail = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:sendPreview(" + item.id + ",\"" + item.email + "\")'>명세서발송<span class='caret'></span></a>\
+                    "
+
+                    return item
+                })
+                table.rows.load(list)
+            }
+
+            function putWorker(id, next = null) {
+
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/worker/" + id,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if (result.success == 1) {
+                        // ajax 이후
+                        $('input, textarea, select').each(
+                            function (index) {
+                                var input = $(this)
+
+                                switch (input.attr('name')) {
+                                    case "worker_id":
+                                        input.val(result.result.item.id)
+                                        selectedWorkerId = result.result.item.id
+                                        break
+                                    case "name":
+                                        input.val(result.result.item.name)
+                                        break
+                                    case "idcard_number":
+                                        input.val(result.result.item.idcard_number)
+                                        break
+                                    case "post_no":
+                                        input.val(result.result.item.post_no)
+                                        break
+                                    case "address":
+                                        input.val(result.result.item.address)
+                                        break
+                                    case "address_detail":
+                                        input.val(result.result.item.address_detail)
+                                        break
+                                    case "part":
+                                        input.val(result.result.item.part)
+                                        break
+                                    case "position":
+                                        input.val(result.result.item.position)
+                                        break
+                                    case "worked_on":
+                                        input.val(result.result.item.worked_on)
+                                        break
+                                    case "contract_type":
+                                        input.val(String(result.result.item.worker_type)).trigger("change")
+                                        break
+                                    case "entered":
+                                        input.val(result.result.item.entered)
+                                        break
+                                    case "resigned":
+                                        input.val(result.result.item.resigned)
+                                        break
+                                    case "email":
+                                        input.val(result.result.item.email)
+                                        break
+                                }
+                            }
+                        )
+
+                        //validateAll()
+                        if (next) {
+                            next()
+                        }
+                    } else {
+                        if (result.errMsg === 'undefined') {
+                            alert("근로자 조회에 실패하였습니다. 관리자에게 문의하세요.")
+                        } else {
+                            alert(result.errMsg)
+                        }
+                    }
+                }).fail(function (data, textStatus, errorThrown) {
+                    let result = eval("(" + data.responseText + ")")
+
+                    if (typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert("근로자 조회에 실패하였습니다. 관리자에게 문의하세요.")
+                    } else {
+                        alert(result.errMsg)
+                    }
+                });
+
+
+            }
+
+            function putPayroll(id) {
+                //alert( id )
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/payroll/" + id,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    //alert( JSON.stringify(result.result.item) )
+                    if (result.success == 1) {
+                        // ajax 이후
+                        $('input, textarea, select').each(function (index) {
+                            var input = $(this)
+
+                            switch (input.attr('name')) {
+                                case "total_working_days":
+                                    input.val(result.result.totalWorkingDays)
+                                    break
+                                case "contract_id":
+                                    input.val(String(result.result.payroll.contract_id))
+                                    break
+                                case "payroll_id":
+                                    input.val(String(result.result.payroll.id))
+                                    break
+                                // case "sallary":
+                                //     input.val( comma(String(result.result.item.sallary)) )
+                                //     break
+                                // case "realSallary":
+                                //     input.val( result.result.calc.realSallaryString )
+                                //     break
+                                // case "overDurationMoney":
+                                //     input.val( result.result.calc.overDurationMoneyString )
+                                //     break
+                                // case "nightDurationMoney":
+                                //     input.val( result.result.calc.nightDurationMoneyString )
+                                //     break
+                                // case "holidayDurationMoney":
+                                //     input.val( result.result.calc.holidayDurationMoneyString )
+                                //     break
+                                // case "holidayOverDurationMoney":
+                                //     input.val( result.result.calc.holidayOverDurationMoneyString )
+                                //     break
+                                case "delayed_time":
+                                    input.val(result.result.payroll.delayed_time)
+                                    break
+                                case "night_time":
+                                    input.val(result.result.payroll.night_time)
+                                    break
+                                case "holiday_time":
+                                    input.val(result.result.payroll.holiday_time)
+                                    break
+                                case "holiday_delayed_time":
+                                    input.val(result.result.payroll.holiday_delayed_time)
+                                    break
+                                // case "yearOffMoney":
+                                //     input.val( result.result.calc.yearOffMoneyString )
+                                //     break
+                                // case "positionMoney":
+                                //     input.val( result.result.calc.positionMoneyString )
+                                //     break
+                                // case "babyMoney":
+                                //     input.val( result.result.calc.babyMoneyString )
+                                //     break
+                                // case "foodMoney":
+                                //     input.val( result.result.calc.foodMoneyString )
+                                //     break
+                                // case "carMoney":
+                                //     input.val( result.result.calc.carMoneyString )
+                                //     break
+                                case "basic_time":
+                                    input.val(result.result.payroll.basic_time)
+                                    break
+                                case "working_days":
+                                    input.val(result.result.payroll.working_days)
+                                    break
+                                case "offday_per_year_time":
+                                    input.val(result.result.payroll.offday_per_year_time)
+                                    break
+                                case "minus_time":
+                                    input.val(result.result.payroll.minus_time)
+                                    break
+                                case "benefit":
+                                    input.val(comma(String(result.result.payroll.benefit)))
+                                    break
+                                case "minus_moey":
+                                    input.val(comma(String(result.result.payroll.minus_moey)))
+                                    break
+                                case "employment_insurance":
+                                    input.val(comma(String(result.result.payroll.employment_insurance)))
+                                    break
+                                case "health_insurance":
+                                    input.val(comma(String(result.result.payroll.health_insurance)))
+                                    break
+                                case "care_insurance":
+                                    input.val(comma(String(result.result.payroll.care_insurance)))
+                                    break
+                                case "national_pension":
+                                    input.val(comma(String(result.result.payroll.national_pension)))
+                                    break
+                                case "health_insurance_calculate":
+                                    input.val(comma(String(result.result.payroll.health_insurance_calculate)))
+                                    break
+                                case "care_insurance_calculate":
+                                    input.val(comma(String(result.result.payroll.care_insurance_calculate)))
+                                    break
+                                case "income_tax":
+                                    input.val(comma(String(result.result.payroll.income_tax)))
+                                    break
+                                case "resident_tax":
+                                    input.val(comma(String(result.result.payroll.resident_tax)))
+                                    break
+                                case "employment_insurance_support":
+                                    input.val(comma(String(result.result.payroll.employment_insurance_support)))
+                                    break
+                                case "national_pension_support":
+                                    input.val(comma(String(result.result.payroll.national_pension_support)))
+                                    break
+                                case "year_calcurate_income_tax":
+                                    input.val(comma(String(result.result.payroll.year_calcurate_income_tax)))
+                                    break
+                                case "year_calcurate_resident_tax":
+                                    input.val(comma(String(result.result.payroll.year_calcurate_resident_tax)))
+                                    break
+                                case "year_calcurate_health_insurance":
+                                    input.val(comma(String(result.result.payroll.year_calcurate_health_insurance)))
+                                    break
+                                case "year_calcurate_care_insurance":
+                                    input.val(comma(String(result.result.payroll.year_calcurate_care_insurance)))
+                                    break
+                                case "etc_minus_money":
+                                    input.val(comma(String(result.result.payroll.etc_minus_money)))
+                                    break
+                                case "sallary":
+                                    if (result.result.payroll.sallary != 0) {
+                                        input.val(comma(String(result.result.payroll.sallary)))
+                                    } else {
+                                        input.val(comma(String(result.result.item.sallary)))
+                                    }
+                                    break
+                                case "realSallary":
+                                    input.val(comma(String(result.result.payroll.basic_money)))
+                                    break
+                                case "overDurationMoney":
+                                    input.val(comma(String(result.result.payroll.delayed_money)))
+                                    break
+                                case "nightDurationMoney":
+                                    input.val(comma(String(result.result.payroll.night_money)))
+                                    break
+                                case "holidayDurationMoney":
+                                    input.val(comma(String(result.result.payroll.holiday_money)))
+                                    break
+                                case "holidayOverDurationMoney":
+                                    input.val(comma(String(result.result.payroll.holiday_delayed_money)))
+                                    break
+                                case "yearOffMoney":
+                                    input.val(comma(String(result.result.payroll.offday_per_year_money)))
+                                    break
+                                case "positionMoney":
+                                    input.val(comma(String(result.result.payroll.position_money)))
+                                    break
+                                case "babyMoney":
+                                    input.val(comma(String(result.result.payroll.baby_money)))
+                                    break
+                                case "foodMoney":
+                                    input.val(comma(String(result.result.payroll.food_money)))
+                                    break
+                                case "carMoney":
+                                    input.val(comma(String(result.result.payroll.car_money)))
+                                    break
+                            }
+                        })
+
+                        //return { type: type, day: day, startend: startend, rest1: rest1, rest2: rest2, rest3: rest3, pattern: pattern }
+
+                        //alert( "validateAll" )
+                        validateAll()
+
+                    } else {
+                        if (result.errMsg === 'undefined') {
+                            alert("계약서 조회에 실패하였습니다. 관리자에게 문의하세요.")
+                        } else {
+                            alert(result.errMsg)
+                        }
+                    }
+                }).fail(function (data, textStatus, errorThrown) {
+                    // TODO: fail 일 경우 에러코드가 없다. 전체 적용. ( cros 때문에 200으로 보내기 때문. )
+                    alert("계약서 조회에 실패하였습니다. 관리자에게 문의하세요.")
+                });
+
+
+            }
+
+
+            function putContractCalc(id = null) {
+                //alert( id )
+
+                if ($('#worker_id').val() == null || $('#worker_id').val() == "") {
+                    alert("하단의 리스트에서 근로자를 먼저 선택해 주세요.")
+                    return
+                }
+
+                if (confirm("기존에 입력하신 값이 계산된 값으로 덮어 씌워질 수 있습니다. 계속 하시겠습니까?") == false) {
+                    return
+                }
+
+                if (id == null) {
+                    id = $('#contract_id').val()
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/contract/" + id,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    //alert( JSON.stringify(result.result.item) )
+                    if (result.success == 1) {
+                        // ajax 이후
+                        let working_days = Number($("#working_days").val())
+                        let total_working_days = Number($("#total_working_days").val())
+                        let totalratio = 1.0
+
+                        if (working_days !== 0) {
+                            totalratio = (working_days / total_working_days)
+                            if (totalratio > 1.0) {
+                                totalratio = 1.0
+                            }
+                        }
+
+                        $('input, textarea, select').each(function (index) {
+                            var input = $(this)
+
+                            switch (input.attr('name')) {
+                                case "sallary":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.item.sallary * totalratio))))
+                                    } else {
+                                        input.val(comma(String(result.result.item.sallary)))
+                                    }
+                                    break
+                                case "realSallary":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.realSallary * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.realSallaryString)
+                                    }
+                                    break
+                                case "overDurationMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.overDurationMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.overDurationMoneyString)
+                                    }
+                                    break
+                                case "nightDurationMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.nightDurationMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.nightDurationMoneyString)
+                                    }
+                                    break
+                                case "holidayDurationMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.holidayDurationMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.holidayDurationMoneyString)
+                                    }
+                                    break
+                                case "holidayOverDurationMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.holidayOverDurationMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.holidayOverDurationMoneyString)
+                                    }
+                                    input.val(result.result.calc.holidayOverDurationMoneyString)
+                                    break
+                                case "delayed_time":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(Math.round(result.result.calc.overDuration * totalratio))
+                                    } else {
+                                        input.val(result.result.calc.overDuration)
+                                    }
+                                    break
+                                case "night_time":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(Math.round(result.result.calc.nightDuration * totalratio))
+                                    } else {
+                                        input.val(result.result.calc.nightDuration)
+                                    }
+                                    break
+                                case "holiday_time":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(Math.round(result.result.calc.holidayDuration * totalratio))
+                                    } else {
+                                        input.val(result.result.calc.holidayDuration)
+                                    }
+                                    break
+                                case "holiday_delayed_time":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(Math.round(result.result.calc.holidayOverDuration * totalratio))
+                                    } else {
+                                        input.val(result.result.calc.holidayOverDuration)
+                                    }
+                                    break
+                                case "yearOffMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.yearOffMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.yearOffMoneyString)
+                                    }
+                                    break
+                                case "positionMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.positionMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.positionMoneyString)
+                                    }
+                                    break
+                                case "babyMoney":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.babyMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.babyMoneyString)
+                                    }
+                                    break
+                                case "foodMoney":
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.foodMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.foodMoneyString)
+                                    }
+                                    break
+                                case "carMoney":
+                                    if (working_days !== 0) {
+                                        input.val(comma(String(Math.round(result.result.calc.carMoney * totalratio))))
+                                    } else {
+                                        input.val(result.result.calc.carMoneyString)
+                                    }
+                                    break
+                                case "basic_time":
+                                    // workingdays
+                                    if (working_days !== 0) {
+                                        input.val(Math.round(result.result.calc.baseDuration * totalratio))
+                                    } else {
+                                        input.val(result.result.calc.baseDuration)
+                                    }
+                                    break
+                            }
+
+
+                        })
+
+                        //return { type: type, day: day, startend: startend, rest1: rest1, rest2: rest2, rest3: rest3, pattern: pattern }
+
+                        //alert( "validateAll" )
+                        validateAll()
+
+                    } else {
+                        if (result.errMsg === 'undefined') {
+                            alert("계약서 조회에 실패하였습니다. 관리자에게 문의하세요.")
+                        } else {
+                            alert(result.errMsg)
+                        }
+                    }
+                }).fail(function (data, textStatus, errorThrown) {
+                    // TODO: fail 일 경우 에러코드가 없다. 전체 적용. ( cros 때문에 200으로 보내기 때문. )
+                    alert("계약서 조회에 실패하였습니다. 관리자에게 문의하세요.")
+                });
+
+
+            }
+
+            function doEdit() {
+
+                if ($('#worker_id').val() == null || $('#worker_id').val() == "") {
+                    alert("하단의 리스트에서 근로자를 먼저 선택해 주세요.")
+                    return
+                }
+
+                if (isCollapsePanel($('#payrollPanel'))) {
+                    $('#payrollPanel').click()
+                    return
+                }
+
+                doEditPayroll($('#payroll_id').val())
+            }
+        </script>
+        <script>
+
+            ////////////////////////////////////////////////////////////
+            // TODO: utils/control
+
+            // 숫자만 입력하는 부분에 event.target.value.replace(/[^-\.0-9]/g, ""); 로 바꿔주면 소수점까지 입력할 수 있습니다.
+            function removeChar(event, obj = null) {
+                event = event || window.event;
+                var keyID = (event.which) ? event.which : event.keyCode;
+
+                if (keyID == 46 || keyID == 37 || keyID == 39) {
+                    return;
+                } else {
+                    //숫자만 입력 
+                    event.target.value = event.target.value.replace(/[^0-9]/g, "");
+                }
+            }
+
+            function comma(obj) {
+                var regx = new RegExp(/(-?\d+)(\d{3})/);
+                var bExists = obj.indexOf(".", 0);
+                var strArr = obj.split('.');
+
+                while (regx.test(strArr[0])) {
+                    strArr[0] = strArr[0].replace(regx, "$1,$2");
+                }
+                if (bExists > -1) {
+                    obj = strArr[0] + "." + strArr[1];
+                } else {
+                    obj = strArr[0];
+                }
+
+                return obj;
+            }
+
+            function inputNumberFormat(obj) {
+                obj.value = comma(obj.value);
+            }
+
+            // "removeChar(event);inputNumberFormat(this);" onKeyDown="inputNumberFormat(this);"
+            ////////////////////////////////////////////////////////////
+
+            let spinnerId = '#loading_spinner'
+
+            function registerSpinner(id) {
+                spinnerId = id
+            }
+
+            function showSpinner() {
+                if ($(spinnerId).hasClass('hidden') == true) {
+                    $(spinnerId).removeClass('hidden')
+                }
+            }
+
+            function hideSpinner() {
+                if ($(spinnerId).hasClass('hidden') == false) {
+                    $(spinnerId).addClass('hidden')
+                }
+            }
+            ////////////////////////////////////////////////////////////
+
+            let selectedUserId = '<%= nomu.user.user_id %>'
+            let selectedWorkerId = -1
+
+            // TODO: 날자 선택하도록 변경.
+            const today = new Date()
+            const formattedMonth = today.toISOString().slice(0, 8).replace(/-/g, '')
+
+
+            const clearForm = (target) => {
+                $(target).html("")
+            }
+            ////////////////////////////////////////////////////////////
+
+            function sendPreview(id, email) {
+                // 현재 API 문제로 잠시 빼 둠.
+                //putContract(2)
+
+                alert("메일 API 점검 중.")
+            }
+
+            function previewPayroll(id, uri) {
+                let viewer = "<%= config.path.was %>" + "assets/vendor/pdfjs-2.12.313-legacy-dist/web/viewer.html"
+                let query = "?file=" + /* uri */ "<%= config.path.rest %>" + "v1/util/file/" + uri
+                if (uri && uri !== "") {
+                    window.open(viewer + query)
+                } else {
+                    showSpinner()
+
+                    $.ajax({
+                        type: "GET",
+                        url: "<%=config.path.rest%>v1/payroll/" + id + "/preview",
+                        headers: {
+                            'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                        },
+                    }).done(function (data, textStatus, xhr) {
+                        hideSpinner()
+                        let result = data
+                        if (result.success == 1) {
+                            query = "?file=" + /* uri */ "<%= config.path.rest %>" + "v1/util/file/" + result.result.item.pdf_uri
+                            // ajax 이후
+                            window.open(viewer + query)
+                            reloadPayrollTable(table, setData)
+                        } else {
+                            if (result.errMsg === 'undefined') {
+                                alert("미리보기 생성에 실패하였습니다. 관리자에게 문의하세요.")
+                            } else {
+                                alert(result.errMsg)
+                            }
+                        }
+                    }).fail(function (data, textStatus, errorThrown) {
+                        hideSpinner()
+                        let result = eval("(" + data.responseText + ")")
+
+                        if (typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                            alert("미리보기 생성에 실패하였습니다. 관리자에게 문의하세요.")
+                        } else {
+                            alert(result.errMsg)
+                        }
+                    });
+
+                }
+            }
+
+
+            function editPayroll(id, worker_id) {
+                if (isCollapsePanel($('#payrollPanel'))) {
+                    $('#payrollPanel').click()
+                }
+
+                putWorker(worker_id, () => {
+                    putPayroll(id)
+                })
+            }
+
+            function doEditPayroll(id) {
+                if (isCollapsePanel($('#payrollPanel'))) {
+                    $('#payrollPanel').click()
+                    return
+                }
+
+                let success = validateAll()
+                let othersSuccess = withOther()
+
+                if (success && othersSuccess) {
+
+                    const body = getPostBody()
+
+                    //alert( JSON.stringify(body) )
+
+                    //showSpinner()
+                    $.ajax({
+                        type: "PUT",
+                        url: "<%=config.path.rest%>v1/payroll/" + id,
+                        data: body,
+                        headers: {
+                            'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                        },
+                    }).done(function (data, textStatus, xhr) {
+                        //hideSpinner()
+
+                        let result = data
+                        if (result.success == 1) {
+                            // 값들 다시 비우고, 접어.
+                            clear()
+                            if (isCollapsePanel($('#payrollPanel')) == false) {
+                                $('#payrollPanel').click()
+                            }
+                            reloadPayrollTable(table, setData)
+                        } else {
+                            if (result.errMsg === 'undefined') {
+                                alert("작업에 실패하였습니다. 관리자에게 문의하세요.")
+                            } else {
+                                alert(result.errMsg)
+                            }
+                        }
+                    }).fail(function (data, textStatus, errorThrown) {
+                        //hideSpinner()
+
+                        //alert( data.responseText )
+                        let result = eval("(" + data.responseText + ")")
+
+                        if (typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                            alert("작업에 실패하였습니다. 관리자에게 문의하세요.")
+                        } else {
+                            alert(result.errMsg)
+                        }
+                    });
+
+                    //prepareSubmit()
+                }
+            }
+
+            function clear() {
+                $('input, textarea').each(
+                    function (index) {
+                        var input = $(this)
+                        input.val("")
+                    }
+                )
+                $('select').each(
+                    function (index) {
+                        var input = $(this)
+                        input.prop("selectedIndex", 0).trigger("change")
+                    }
+                )
+            }
+
+            function validateAll() {
+                let ret = validateAllInputs(inputs)
+
+                if (validateAddress() == false) {
+                    ret = false
+                }
+
+                return ret
+            }
+
+            function doCancelEdit() {
+                clear()
+
+                if (isCollapsePanel($('#payrollPanel')) == false) {
+                    $('#payrollPanel').click()
+                }
+            }
+
+            function cancelEdit() {
+                if (confirm("수정을 취소하시겠습니까?")) {
+                    doCancelEdit()
+                }
+
+            }
+
+        </script>
+        <%- include( 'addressSearchScript' ) %>
+            <script src="assets/scripts/validate.js"></script>
+            <script>
+                let inputs = [
+                    { id: "name", feedback_id: "name_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                    { id: "idcard_number", feedback_id: "idcard_number_feedback", type: validate_types.idcard_number, minLen: 1, maxLen: 14, feedback: "형식을 확인해주세요.(ex: 111111-1111111)", required: true },
+                    { id: "position", feedback_id: "position_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                    { id: "part", feedback_id: "part_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                    { id: "worked_on", feedback_id: "worked_on_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+
+                    { id: "working_days", feedback_id: "working_days_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "근무일수를 입력해 주세요", required: true },
+                    { id: "basic_time", feedback_id: "basic_time_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "기본근로시간을 입력해 주세요", required: true },
+
+                    // { id: "entered", feedback_id: "entered_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                    // { id: "resigned", feedback_id: "resigned_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: false },
+                    // { id: "email", feedback_id: "email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+                    // { id: "contract_start_date", feedback_id: "contract_start_date_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                    // { id: "contract_end_date", feedback_id: "contract_end_date_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                    // { id: "contract_writing_date", feedback_id: "contract_writing_date_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                    // { id: "sallary", feedback_id: "sallary_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "월급여를 입력해 주세요", required: true },
+                    // { id: "sallary_day", feedback_id: "sallary_day_feedback", type: validate_types.none, minLen: 1, maxLen: 2, feedback: "급여일을 입력해 주시거나 형태를 확인해 주세요.", required: true },
+                ]
+
+                let withOther = () => {
+
+
+                    return true
+                }
+
+            </script>
+            <script>
+
+                function getPostBody() {
+                    let payrollBody = {}
+
+                    $('input, textarea, select').each(function (index) {
+                        var input = $(this)
+
+                        switch (input.attr('name')) {
+                            case "payroll_id":
+                                payrollBody.payroll_id = input.val()
+                                break
+                            case "basic_time":
+                                payrollBody.basic_time = input.val()
+                                break
+                            case "working_days":
+                                payrollBody.working_days = input.val()
+                                break
+                            case "offday_per_year_time":
+                                payrollBody.offday_per_year_time = input.val()
+                                break
+                            case "minus_time":
+                                payrollBody.minus_time = input.val()
+                                break
+                            case "benefit":
+                                payrollBody.benefit = input.val()
+                                break
+                            case "minus_moey":
+                                payrollBody.minus_moey = input.val()
+                                break
+                            case "employment_insurance":
+                                payrollBody.employment_insurance = input.val()
+                                break
+                            case "health_insurance":
+                                payrollBody.health_insurance = input.val()
+                                break
+                            case "care_insurance":
+                                payrollBody.care_insurance = input.val()
+                                break
+                            case "national_pension":
+                                payrollBody.national_pension = input.val()
+                                break
+                            case "health_insurance_calculate":
+                                payrollBody.health_insurance_calculate = input.val()
+                                break
+                            case "care_insurance_calculate":
+                                payrollBody.care_insurance_calculate = input.val()
+                                break
+                            case "income_tax":
+                                payrollBody.income_tax = input.val()
+                                break
+                            case "resident_tax":
+                                payrollBody.resident_tax = input.val()
+                                break
+                            case "employment_insurance_support":
+                                payrollBody.employment_insurance_support = input.val()
+                                break
+                            case "national_pension_support":
+                                payrollBody.national_pension_support = input.val()
+                                break
+                            case "year_calcurate_income_tax":
+                                payrollBody.year_calcurate_income_tax = input.val()
+                                break
+                            case "year_calcurate_resident_tax":
+                                payrollBody.year_calcurate_resident_tax = input.val()
+                                break
+                            case "year_calcurate_health_insurance":
+                                payrollBody.year_calcurate_health_insurance = input.val()
+                                break
+                            case "year_calcurate_care_insurance":
+                                payrollBody.year_calcurate_care_insurance = input.val()
+                                break
+                            case "etc_minus_money":
+                                payrollBody.etc_minus_money = input.val()
+                                break
+                            case "basic_money":
+                                payrollBody.basic_money = input.val()
+                                break
+                            case "sallary":
+                                payrollBody.sallary = input.val()
+                                break
+                            case "realSallary":
+                                payrollBody.basic_money = input.val()
+                                break
+                            case "overDurationMoney":
+                                payrollBody.delayed_money = input.val()
+                                break
+                            case "nightDurationMoney":
+                                payrollBody.night_money = input.val()
+                                break
+                            case "holidayDurationMoney":
+                                payrollBody.holiday_money = input.val()
+                                break
+                            case "holidayOverDurationMoney":
+                                payrollBody.holiday_delayed_money = input.val()
+                                break
+                            case "delayed_time":
+                                payrollBody.delayed_time = input.val()
+                                break
+                            case "night_time":
+                                payrollBody.night_time = input.val()
+                                break
+                            case "holiday_time":
+                                payrollBody.holiday_time = input.val()
+                                break
+                            case "holiday_delayed_time":
+                                payrollBody.holiday_delayed_time = input.val()
+                                break
+                            case "yearOffMoney":
+                                payrollBody.offday_per_year_money = input.val()
+                                break
+                            case "positionMoney":
+                                payrollBody.position_money = input.val()
+                                break
+                            case "babyMoney":
+                                payrollBody.baby_money = input.val()
+                                break
+                            case "foodMoney":
+                                payrollBody.food_money = input.val()
+                                break
+                            case "carMoney":
+                                payrollBody.car_money = input.val()
+                                break
+                        }
+                    })
+
+                    // alert( JSON.stringify(workerBody) + "A" )
+                    // alert( JSON.stringify(contractBody) )
+
+                    return { payroll: payrollBody }
+                }
+            </script>
+            <script>
+                const uploadExcelButton = () => {
+                    $('#excel').click()
+                }
+
+                const uploadExcel = () => {
+                    // alert( "값들의 정확한 입력을 위한 추가 코드 작성 중입니다. 내일 오전 중 재 오픈 하겠습니다.")
+                    // return
+
+                    showSpinner()
+
+                    var form = $('#excelForm')[0];
+                    //alert( JSON.stringify(form) )
+                    // Create an FormData object          
+                    var data = new FormData(form);
+                    //alert( JSON.stringify(data) )
+
+                    // TODO: IE10 이하에서 FormData 때문에 안 될 수 있으니 확인 필요.. 근데 어짜피 서명 쪽 캔버스 쓰려면 IE10 미만 지원이 되려나..
+                    $.ajax({
+                        type: "POST",
+                        url: "<%=config.path.rest%>v1/payroll/excel/" + formattedMonth,
+                        headers: {
+                            'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                        },
+                        enctype: 'multipart/form-data',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        cache: false,
+                        timeout: 600000,
+                    }).done(function (data, textStatus, xhr) {
+                        hideSpinner()
+
+                        let result = data
+                        reloadPayrollTable(table, setData)
+                        clear()
+                        // TODO: worker 들 contract 로 변경. ( 현재는 테스트 기간이므로 보류 )
+                        if ($('#newWorkerButtons').hasClass('hidden')) {
+                            togglePanelButton()
+                        }
+                        if (isCollapsePanel($('#workerPanel')) == false) {
+                            $('#workerPanel').click()
+                        }
+
+                        if (result.success == 1) {
+                            alert("엑셀 입력에 성공하였습니다.")
+                        } else {
+                            if (result.errMsg === 'undefined') {
+                                alert("엑셀 입력에 실패하였습니다. 입력 폼을 확인해 주세요.")
+                            } else {
+                                alert(result.errMsg)
+                            }
+                        }
+                    }).fail(function (data, textStatus, errorThrown) {
+                        hideSpinner()
+
+                        let result = eval("(" + data.responseText + ")")
+
+                        if (typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                            alert("통신에 실패하였습니다")
+                        } else {
+                            alert(result.errMsg)
+                        }
+                    });
+
+
+                    // TODO 작업 완료 후, 인풋 필드 클리어. 또한 이 함수에선 시작 시 인풋 필드 비어있는지 체크해서 비었으면 리턴.
+                }
+
+                const downloadExcel = () => {
+                    // alert( "값들의 정확한 입력을 위한 추가 코드 작성 중입니다. 내일 오전 중 재 오픈 하겠습니다.")
+                    // return
+
+                    showSpinner()
+                    $.ajax({
+                        type: "GET",
+                        url: "<%=config.path.rest%>v1/payroll/excel/" + formattedMonth,
+                        headers: {
+                            'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                        },
+                        xhrFields: {
+                            responseType: 'blob'
+                        },
+                    }).done(function (data, textStatus, xhr) {
+                        hideSpinner()
+
+                        const fileName = "payroll.xlsx"
+                        if (window.navigator.msSaveOrOpenBlob) {
+                            window.navigator.msSaveBlob(data, fileName);
+                            return;
+                        }
+                        const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel;" })
+                        const path = (window.URL ? URL : webkitURL).createObjectURL(blob);
+                        const link = document.createElement('a')
+                        link.href = path
+                        link.download = fileName
+                        link.click();
+                        (window.URL ? URL : webkitURL).revokeObjectURL(path)
+                        link.remove()
+
+                    }).fail(function (data, textStatus, errorThrown) {
+                        hideSpinner()
+                        alert("엑셀 다운로드에 실패하였습니다. 관리자에게 문의하세요.")
+
+                    });
+                }
+            </script>
+
+</html>

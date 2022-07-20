@@ -1,0 +1,1852 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head' , { title: "" } ) %>
+
+    <body>
+        <div class="main-content">
+            <div class="container-fluid">
+                <h3 class="page-title">
+                    근로계약서
+                </h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="">
+                            <button type="button" class="btn btn-primary btn-excel" onclick="javascript:uploadExcelButton()"><i
+                                    class="fa fa-upload"></i> 엑셀 입력하기</button>
+                            <button type="button" class="btn btn-success btn-excel" download onclick="javascript:downloadExcel()"><i
+                                    class="fa fa-download"></i> 엑셀 다운로드</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- PANEL DEFAULT -->
+                        <div id="detailPanel" class="panel hidden">
+                            <div class="panel-heading">
+                                <div class="right">
+                                    <button type="button" id="contractPanel" class="btn-toggle-collapse"><i
+                                            class="lnr lnr-chevron-up"></i></button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <%- include( 'contractDetailContent' , { title: "" } ) %>
+                            </div>
+                            <div class="panel-footer panel-footer-right form-inline">
+                                <div class="form-inline" id="newWorkerButtons">
+                                    <buttontype="button" class="btn btn-primary" onclick="javascript:addcontract()"><i
+                                            class="fa fa-pencil"></i> 계약서 등록</button>
+                                </div>
+                                <div class="form-inline hidden" id="editWorkerButtons">
+                                    <button type="button" class="btn btn-danger pull-left" onclick="javascript:deleteContract()">삭제</button>
+                                    <button id="newWorker" type="button" class="btn btn-primary" onclick="javascript:doEdit()">수정</button>
+                                    <button type="button" class="btn"
+                                        onclick="javascript:cancelEdit()">취소</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END PANEL DEFAULT -->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <table class="table table-striped" id="table" data-paging-position="right">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include( 'spinner' ) %>
+        </div>
+        <form id="excelForm" action="uploadWorkerExcel" method="POST">
+            <input type="file" id="excel" name="excel" class="hidden" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onchange="javascript:uploadExcel()"/>
+        </form>
+    </body>
+
+    <!-- Javascript -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/vendor/footable/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Add in any FooTable dependencies we may need -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+    <script src="assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="assets/scripts/klorofil-common.js"></script>
+    <script src="assets/scripts/nomu-common.js"></script>
+    <script src="assets/scripts/nomu-common-control.js"></script>
+    <!-- FOO TABLE 필요시 모듈화 -->
+    <script src="assets/vendor/footable/js/footable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js" integrity="sha512-L4qpL1ZotXZLLe8Oo0ZyHrj/SweV7CieswUODAAPN/tnqN3PA1P+4qPu5vIryNor6HQ5o22NujIcAZIfyVXwbQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <%- include( 'contractListDataTableScript' ) %>
+    <script>
+        let table = {}
+
+        jQuery(function ($) {
+            table = FooTable.init('#table', contractTableSetting)
+            reloadContractTable(table, setData)
+
+            hidePanelOnStart($('#contractPanel'))
+            $('#detailPanel').toggleClass('hidden')
+        });
+
+        function setData( table, list ) {
+            list.map((item) => {
+
+                item.nameTag = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:editContract(" + item.contract_id + ", " + item.worker_id + ")'>" + item.name + "<span class='caret'></span></a>\
+                    "
+
+                if ( item.schedule > 0 ) {
+                    item.preview = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:previewContract(" + item.contract_id + ",\"" + (item.pdf_uri?item.pdf_uri:"") + "\")'>미리보기<span class='caret'></span></a>\
+                    "
+                } else {
+                    item.preview = "<a class='text-danger'>스케쥴 입력 필요</a>"
+                }
+                
+                switch( item.contractType ) {
+                    case 0:
+                        item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.normal) %>'
+                        break
+                    case 1:
+                        item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.duration) %>'
+                        break
+                    case 2:
+                        item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.daily) %>'
+                        break
+                    default:
+                        item.constract_type_string = '셀프작성'
+                        break
+                }
+    
+                if ( item.signed == 0 ) {
+                    item.signed_string = "<a href='javascript:prepareSign(" + item.contract_id + "," + item.worker_id + ")'>서명 필요<span class='caret'></span></a>"
+                } else {
+                    item.signed_string = "서명 완료"
+                }
+                
+                if ( item.signed == 0 ) {
+                    item.sendMail = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:sendPreview(" + item.contract_id + ",\"" + item.email + "\")'>초안메일발송<span class='caret'></span></a>\
+                    "
+                } else {
+                    item.sendMail = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:sendPreview(" + item.contract_id + ",\"" + item.email + "\")'>계약서발송<span class='caret'></span></a>\
+                    "
+                }
+
+                return item
+            })
+            table.rows.load(list)
+        }
+
+        function prepareSign( contractId, workerId ) {
+            $.ajax({
+                    url: "<%=config.path.rest%>v1/contract/prepareSign",
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                    type: "POST",
+                    data: { workerId: workerId, contractId: contractId },   
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        alert( JSON.stringify(result.result) )
+                    } else {
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "서명 신청에 실패하였습니다." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = data
+                    if ( result.errMsg === 'undefined' ) {
+                        alert( "서명 신청에 실패하였습니다." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+        }
+
+        function putWorker( id, next = null ) {
+
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/worker/" + id,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        // ajax 이후
+                        $('input, textarea, select').each(
+                            function(index){  
+                                var input = $(this)
+                                
+                                switch( input.attr('name') ) {
+                                    case "worker_id":
+                                        input.val( result.result.item.id )
+                                        selectedWorkerId = result.result.item.id
+                                        break
+                                    case "name":
+                                        input.val( result.result.item.name )
+                                        break
+                                    case "idcard_number":
+                                        input.val( result.result.item.idcard_number )
+                                        break
+                                    case "post_no":
+                                        input.val( result.result.item.post_no )
+                                        break
+                                    case "address":
+                                        input.val( result.result.item.address )
+                                        break
+                                    case "address_detail":
+                                        input.val( result.result.item.address_detail )
+                                        break
+                                    case "part":
+                                        input.val( result.result.item.part )
+                                        break
+                                    case "position":
+                                        input.val( result.result.item.position )
+                                        break
+                                    case "worked_on":
+                                        input.val( result.result.item.worked_on )
+                                        break
+                                    case "contract_type":
+                                        input.val( String(result.result.item.worker_type) ).trigger("change")
+                                        break
+                                    case "entered":
+                                        input.val( result.result.item.entered )
+                                        break
+                                    case "resigned":
+                                        input.val( result.result.item.resigned )
+                                        break
+                                    case "email":
+                                        input.val( result.result.item.email )
+                                        break
+                                    case "contract_start_date":
+                                        // 계약 시작일을 입사일과 맞추어 달라는 요청. 하지만 수정 가능하도록 작업.
+                                        if ( result.result.item.worker_type == 0 || result.result.item.worker_type == 1 ) {
+                                            input.val( result.result.item.entered )
+                                        }
+                                        break
+                                    case "contact_end_date":
+                                        if ( result.result.item.worker_type == 0 || result.result.item.worker_type == 1 ) {
+                                            if ( result.result.resigned !== null || result.result.resigned !== "" ) {
+                                                input.val( result.result.item.resigned )
+                                            }
+                                        }
+                                        break
+                                }
+                            }
+                        )
+                         
+                        validateAll()
+                        if ( next ) {
+                            next()
+                        }
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "근로자 조회에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "근로자 조회에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+
+            }
+
+        function putContract( id ) {
+            //alert( id )
+            $.ajax({
+                type: "GET",
+                url: "<%=config.path.rest%>v1/contract/" + id,
+                headers: {
+                    'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                },  
+            }).done(function (data, textStatus, xhr) {
+                let result = data
+
+                result.result.item.benefit_values.split(",").map((value) => {
+                    return Number(value)
+                }).forEach( (value, index) => {
+                    benefits[index].value = value
+                })
+
+                //alert( JSON.stringify(result.result.item) )
+                if(result.success == 1){
+                    // ajax 이후
+                    $('input, textarea, select').each( function(index) {  
+                        var input = $(this)
+                        
+                        switch( input.attr('name') ) {
+                            case "contract_id":
+                                input.val( String(result.result.item.contract_id) )
+                                break
+                            case "contract_type":
+                                input.val( String(result.result.item.contractType) ).trigger("change")
+                                break
+                            case "contract_start_date":
+                                input.val( result.result.item.start_date )
+                                break
+                            case "contract_end_date":
+                                input.val( result.result.item.end_date )
+                                break
+                            case "contract_writing_date":
+                                input.val( result.result.item.writing_date )
+                                break
+                            case "sallary":
+                                input.val( comma(String(result.result.item.sallary)) )
+                                break
+                            case "sallary_day":
+                                input.val( "<%= nomu.user.pay_day %>" )
+                                break
+                            case "net":
+                                input.val( String(result.result.item.net) ).trigger("change")
+                                break
+                            case "over5":
+                                input.val( String(result.result.item.evenOver5) ).trigger("change")
+                                break
+                            case "gamdan":
+                                input.val( String(result.result.item.gamdan) ).trigger("change")
+                                break
+                            case "fired_reason":
+                                input.val( result.result.item.option_description )
+                                break
+                            case "rookie":
+                                input.val( String(result.result.item.internship) ).trigger("change")
+                                break
+                            case "rookie_duration":
+                                input.val( result.result.item.internship_duration )
+                                break
+                            case "rookie_percent":
+                                input.val( result.result.item.internship_percent )
+                                break
+                            case "working_schedule":
+                                input.val( String(result.result.item.working_type) ) //.trigger("change")
+                                break
+                            case "offday_for_sheet":
+                                input.val( String(result.result.item.offday_type) ).trigger("change")
+                                break
+                            case "off_per_month":
+                                input.val( String(result.result.item.offday_count_per_month) ).trigger("change")
+                                break
+                            case "inclusive_wage":
+                                input.val( String(result.result.item.inclusive_wage) ).trigger("change")
+                                break
+                            case "benefit_holiday":
+                                //input.val( comma(String(result.result.item.sallary)) )
+                                input.val( result.result.item.benefit_holiday )
+                                break
+                            case "benefit_over":
+                                //input.val( comma(String(result.result.item.sallary)) )
+                                input.val( result.result.item.benefit_over )
+                                break
+                            case "benefit_night":
+                                //input.val( comma(String(result.result.item.sallary)) )
+                                input.val( result.result.item.benefit_night )
+                                break
+                            case "benefit_over_holiday":
+                                //input.val( comma(String(result.result.item.sallary)) )
+                                input.val( result.result.item.benefit_over_holiday )
+                                break
+                                // 시간, 수당.    
+                            case "daily_mon":
+                                input.prop('checked', result.result.item.daily_mon ? true : false )
+                                break
+                            case "daily_tue":
+                                input.prop('checked', result.result.item.daily_tue ? true : false )
+                                break
+                            case "daily_wed":
+                                input.prop('checked', result.result.item.daily_wed ? true : false )
+                                break
+                            case "daily_thu":
+                                input.prop('checked', result.result.item.daily_thu ? true : false )
+                                break
+                            case "daily_fri":
+                                input.prop('checked', result.result.item.daily_fri ? true : false )
+                                break
+                            case "daily_sat":
+                                input.prop('checked', result.result.item.daily_sat ? true : false )
+                                break
+                            case "daily_sun":
+                                input.prop('checked', result.result.item.daily_sun ? true : false )
+                                break
+                        }
+
+                        // TODO: DB에 추가. 그리고. 일급 정보 입력.
+
+                        
+                    })
+                    renderBenefit()
+
+                    // alert( JSON.stringify( result.result.scheduleObject ) )
+                    // alert( "check scheduleObject" )
+                    if ( result.result.scheduleObject ) {
+                        // alert( "exist scheduleObject" )
+                        renderSchedule(convertSchedule(result.result.scheduleObject))
+                    }
+
+                    //return { type: type, day: day, startend: startend, rest1: rest1, rest2: rest2, rest3: rest3, pattern: pattern }
+                    
+                    //alert( "validateAll" )
+                    validateAll()
+
+                } else {	
+                    if ( result.errMsg === 'undefined' ) {
+                        alert( "계약서 조회에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                }
+            }).fail(function(data, textStatus, errorThrown){
+                // TODO: fail 일 경우 에러코드가 없다. 전체 적용. ( cros 때문에 200으로 보내기 때문. )
+                alert( "계약서 조회에 실패하였습니다. 관리자에게 문의하세요." )
+            });
+
+
+            }
+
+
+
+        function doEdit() {
+            let success = validateAll()
+            let othersSuccess = withOther() 
+
+            if (isCollapsePanel($('#contractPanel'))) {
+                $('#contractPanel').click()
+                return
+            }
+
+            if ( success && othersSuccess ) {
+                if ( confirm("수정하시겠습니까?") == false ) {
+                    return
+                }
+
+                // 수습, 메일 발송, 옵션 스트링 넣기 까지 하고 출발.
+                
+                // 여기서 수정 ajax 호출.
+                //alert( $('#contract_id').val() ) 
+                doEditContract($('#contract_id').val())
+            }
+        }
+
+        function deleteContract() {
+            if ( confirm( "정말 삭제하시겠습니까?") ) {
+
+                //alert( $('#contract_id').val() ) 
+
+                $.ajax({
+                    type: "DELETE",
+                    url: "<%=config.path.rest%>v1/contract/" + $('#contract_id').val(),
+                    data: {},    
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        // 값들 다시 비우고, 접어.
+                        clear()
+                        $('#contractPanel').click()
+                        reloadContractTable(table, setData)
+
+                        doCancelEdit()
+                        
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+            }
+        }
+    </script>
+    <script>
+
+        ////////////////////////////////////////////////////////////
+        // TODO: utils/control
+
+        // 숫자만 입력하는 부분에 event.target.value.replace(/[^-\.0-9]/g, ""); 로 바꿔주면 소수점까지 입력할 수 있습니다.
+        function removeChar(event, obj = null) { 
+            event = event || window.event; 
+            var keyID = (event.which) ? event.which : event.keyCode; 
+            
+            if ( keyID == 46 || keyID == 37 || keyID == 39 ) { 
+                return; 
+            } else { 
+                //숫자만 입력 
+                event.target.value = event.target.value.replace(/[^0-9]/g, ""); 
+            } 
+        }
+
+        function comma(obj) { 
+            var regx = new RegExp(/(-?\d+)(\d{3})/); 
+            var bExists = obj.indexOf(".", 0); 
+            var strArr = obj.split('.'); 
+            
+            while (regx.test(strArr[0])) { 
+                strArr[0] = strArr[0].replace(regx, "$1,$2"); 
+            } 
+            if (bExists > -1) { 
+                obj = strArr[0] + "." + strArr[1]; 
+            } else { 
+                obj = strArr[0]; 
+            } 
+            
+            return obj; 
+        }
+
+        function inputNumberFormat(obj) { 
+            obj.value = comma(obj.value); 
+        }
+
+        function showControl( show, target ) {
+            if ( show ) {
+                if ( $('#' + target ).hasClass('hidden') ) {
+                    $('#'+ target ).removeClass('hidden')
+                    $('#' + target ).removeClass('hidden')
+                }
+            } else {
+                if ( $('#' + target).hasClass('hidden') == false ) {
+                    $('#' + target).addClass('hidden')
+                    $('#' + target).addClass('hidden')
+                }
+            }
+        }
+
+        // "removeChar(event);inputNumberFormat(this);" onKeyDown="inputNumberFormat(this);"
+        ////////////////////////////////////////////////////////////
+
+        let selectedUserId = '<%= nomu.user.user_id %>'
+        let selectedWorkerId = -1
+
+        ////////////////////////////////////////////////////////////
+        // TODO: const
+        // TODO: initFunction
+        let benefits = [
+            { title: "식대", code: 0, value: 0 },
+            { title: "차량유지비", code: 1, value: 0 },
+            { title: "육아수당", code: 2, value: 0 },
+            { title: "직책수당", code: 3, value: 0 },
+            { title: "자격수당", code: 4, value: 0 },
+            { title: "기타제수당", code: 5, value: 0 }
+        ]
+        let basicBenefitCount = benefits.length
+        benefits.push( { title: "연차수당", code: 6, value: 0 } )
+        ////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////
+        // TODO: const
+        //nomu.common.scheduleType.basic
+        //nomu.common.scheduleType.biweekly
+        //nomu.common.scheduleType.basic_option_day
+        //nomu.common.scheduleType.biweekly_option_day
+
+        let scheduleOption = [
+            //{ type: <%= nomu.common.scheduleType.basic %>, day: 0, startend: 0, rest1: 0, rest2: 0, rest3: 0 }
+        ]
+        let scheduleOptionForBiWeek2 = [
+            //{ type: <%= nomu.common.scheduleType.basic %>, day: 0, startend: 0, rest1: 0, rest2: 0, rest3: 0 }
+        ]
+        ////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////
+        // TODO: utils
+        const renderFormWithBody = (name, target, body, next = null) => {
+            //alert( JSON.stringify( body ) )
+            $.post(name, body, (data) => {
+                    $(target).html(data)
+                    
+                    // 여기서 이벤트 연결.
+                    if ( next ) {
+                        next()
+                    }
+                })
+        }
+        const renderForm = (name, target, next = null) => {
+            $.get(name, (data) => {
+                    $(target).html(data)
+                    
+                    // 여기서 이벤트 연결.
+                    if ( next ) {
+                        next()
+                    }
+                })
+        }
+        const renderAppendForm = (name, target, next = null) => {
+            $.get(name, (data) => {
+                    let html = $(target).html()
+                    $(target).html( html + data )
+
+                    // 여기서 이벤트 연결.
+                    if ( next ) {
+                        next()
+                    }
+                })
+        }
+        const clearForm = (target) => {
+            $(target).html("")
+        }
+        ////////////////////////////////////////////////////////////
+        
+        function validateStartEndTime() {
+            
+            let inputs= [ 
+                //{ id: "rookie_duration", feedback_id: "rookie_duration_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "수습기간을 입력해 주세요", required: true },
+            ]
+            let index = 0
+            inputs = inputs.concat( { id: "working_duration_" + index, feedback_id: "working_duration_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: true } )
+            inputs = inputs.concat( { id: "off1_" + index, feedback_id: "off1_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+            inputs = inputs.concat( { id: "off2_" + index, feedback_id: "off2_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+            inputs = inputs.concat( { id: "off3_" + index, feedback_id: "off3_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+            index++;
+            //alert(scheduleOption)
+            scheduleOption.forEach( (option) => {   
+                inputs = inputs.concat( { id: "working_duration_" + index, feedback_id: "working_duration_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: true } )
+                inputs = inputs.concat( { id: "off1_" + index, feedback_id: "off1_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                inputs = inputs.concat( { id: "off2_" + index, feedback_id: "off2_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                inputs = inputs.concat( { id: "off3_" + index, feedback_id: "off3_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                index++;
+            })
+            
+            // 격주
+            if ( $('#working_schedule').val() == "1" ) {
+                inputs = inputs.concat( { id: "working_duration_" + index, feedback_id: "working_duration_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: true } )
+                inputs = inputs.concat( { id: "off1_" + index, feedback_id: "off1_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                inputs = inputs.concat( { id: "off2_" + index, feedback_id: "off2_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                inputs = inputs.concat( { id: "off3_" + index, feedback_id: "off3_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                index++;
+            }
+            
+            //alert(scheduleOptionForBiWeek2)
+            if ( scheduleOptionForBiWeek2 ) {
+                scheduleOptionForBiWeek2.forEach( (option) => {   
+                    inputs = inputs.concat( { id: "working_duration_" + index, feedback_id: "working_duration_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: true } )
+                    inputs = inputs.concat( { id: "off1_" + index, feedback_id: "off1_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                    inputs = inputs.concat( { id: "off2_" + index, feedback_id: "off2_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                    inputs = inputs.concat( { id: "off3_" + index, feedback_id: "off3_" + index + "_feedback", type: validate_types.start_end_time, minLen: 1, maxLen: 11, feedback: "입력형식을 확인해 주세요.( ex: 09:00-18:00 )", required: false } )
+                    index++;
+                })
+
+            }
+
+            //alert( JSON.stringify(inputs) )
+
+            return validateAllInputs(inputs)
+        }
+
+        const renderBenefit = () => {
+            benefits.forEach( (benefit) => {
+                let value = $('#benefit_' + benefit.code).val()
+                //alert( value + " " + benefit.code )
+
+                if ( value && value != "0" ) {
+                    value = value.replace( /,/g, '' )
+                    benefit.value = Number(value)
+
+                    if ( isNaN(benefit.value) ) {
+                        benefit.value = 0
+                    }
+                } else {
+                    //benefit.value = 0
+                }
+
+                benefit.stringValue = comma(String(benefit.value))
+            })
+            //alert( JSON.stringify(benefits ) )
+            
+            renderFormWithBody('contractFormBenefit', '#benefit_container', { benefits: benefits, necessoryCount: basicBenefitCount })
+        }
+        
+
+        // 거지같이 짜졌다 진짜. 꼭. 다 마무리 하고 리펙토링 한다. 시간 관련.
+        function renderSchedule( schedules = [] ) {
+            //return { type: type, day: day, startend: startend, rest1: rest1, rest2: rest2, rest3: rest3, pattern: pattern }
+            //renderFormWithBody('contractFormBenefit', '#benefit_container', { benefits: benefits, necessoryCount: basicBenefitCount })
+
+            let schedule = {}
+            let schedule2 = {}
+
+            let index = 1
+            let exceptSchedule = []
+            let exceptSchedule2 = []
+
+            if ( schedules.length > 0 ) {
+                // 값 로드인 경우.
+                // option 과 option2 에 넣어 준다.
+
+                //alert( "!!!!! load value !!!!!!!" + JSON.stringify( schedules ) )
+
+                schedule = schedules[0]
+                if ( schedules.length > 1 ) {
+                    schedule2 = schedules[1]
+                }
+
+                schedules = []
+
+                
+            }
+
+            //let schedule = getScheduleObject( <%= nomu.common.scheduleType.basic %>, 'schedule_0', 'working_duration_0', 'off1_0', 'off2_0', 'off3_0', 'day_option_day_0' )
+            if ( typeof schedule.day === 'undefined' ) {
+                schedule = { type:  <%= nomu.common.scheduleType.basic %>, day: 15, pattern: 0 }
+            }
+
+            scheduleOption.forEach( (option) => {
+                if ( typeof option.day === 'undefined' ) {
+                    exceptSchedule = exceptSchedule.concat( { type:  <%= nomu.common.scheduleType.basic_option_day %>, day: 1, pattern: 4 } )
+                } else {
+                    exceptSchedule = exceptSchedule.concat( option )
+                }
+                index++
+            })
+
+            // 격주
+            if ( $('#working_schedule').val() == "1" ) {
+                let biIndex = scheduleOption.length + 1
+            
+                schedule.type =  <%= nomu.common.scheduleType.biweekly %>
+                schedule.pattern =  10  // TODO: 코드 정의.
+                //schedule2 = getScheduleObject( <%= nomu.common.scheduleType.biweekly %>, 'schedule_' + biIndex, 'working_duration_' + biIndex, 'off1_' + biIndex, 'off2_' + biIndex, 'off3_' + biIndex, 'day_option_day_' + biIndex )
+                if ( typeof schedule2.day === 'undefined' ) {
+                    schedule2 = { type:  <%= nomu.common.scheduleType.biweekly %>, day: 15, pattern: 10 }
+                }
+
+                exceptSchedule.forEach( (option) => {
+                    option.type = <%= nomu.common.scheduleType.biweekly_option_day %>
+                    option.pattern = 12
+                })
+
+                let index = biIndex + 1    
+                scheduleOptionForBiWeek2.forEach( (option) => {
+                    if ( typeof option.day === 'undefined' ) {
+                        exceptSchedule2 = exceptSchedule2.concat( { type:  <%= nomu.common.scheduleType.biweekly_option_day %>, day: 1, pattern: 12 } )
+                    } else {
+                        exceptSchedule2 = exceptSchedule2.concat( option )
+                    }
+                    index++
+                })
+            }
+
+            schedules = schedules.concat( schedule )
+            schedules = schedules.concat( exceptSchedule )
+            schedules = schedules.concat( schedule2 )
+            schedules = schedules.concat( exceptSchedule2 )
+
+            // alert( "!!! schedules !!!" + JSON.stringify( schedules ) )
+            // alert( "isDaily " + ($('#contract_type').val() == "2") )
+
+            renderFormWithBody('contractFormScheduleContainer', '#schedule_container', { schedules: schedules, isDaily: ($('#contract_type').val() == "2") ? 1: 0 } ) 
+        }
+
+        const initRegularForm = () => {
+            // rookie
+            // rookie_duration_container
+            // rookie_percent_container
+
+            const hideRookie = () => {
+                    $('#rookie_duration_container').addClass('hidden')
+                    $('#rookie_percent_container').addClass('hidden')
+            }
+            const showRookie = () => {
+                    $('#rookie_duration_container').removeClass('hidden')
+                    $('#rookie_percent_container').removeClass('hidden')
+            }
+            const netDescription = ( applyNet ) => {
+                if ( applyNet ) {
+                    $('#net_desc').val("乙의 급여액중 乙이 부담하여야 할 세금 및 사회보험료 등은 甲이 지원한다.")
+                } else {
+                    $('#net_desc').val("乙의 실제 급여액은 세금및 사회보험료 등을 공제한 금액으로 한다.")
+                }
+            }
+            const workingScheduleValidate = ( applySheet ) => {
+                disableOffPerWeek(applySheet)
+            }
+            const setOffShowing = (show) => {
+                if ( show ) {
+                    $('#off_per_month_container').removeClass( 'hidden' )
+                } else {
+                    $('#off_per_month_container').addClass( 'hidden' )
+                }
+            }
+            const disableOffPerWeek = (disabled) => {
+                if ( disabled ) {
+                    $('#offday_for_sheet').val("0")
+                }
+                $('#offday_for_sheet').attr( 'disabled', disabled )
+                setOffShowing($('#offday_for_sheet').val() == "0")
+            }
+            const setInclusiveWageShowing = (show) => {
+                if ( show ) {
+                    $('#inclusive_wage_inputs').removeClass( 'hidden' )
+                } else {
+                    $('#inclusive_wage_inputs').addClass( 'hidden' )
+                }
+            }
+
+            $('#rookie').change( function() {
+                if ( $(this).val() == "0" ) {
+                    hideRookie()
+                } else {
+                    showRookie()
+                }
+            })
+
+            $('#net').change( function() {
+                netDescription( $(this).val() == "1" )
+            })
+
+            $('#working_schedule').change( function() {
+                scheduleOption = []
+                scheduleOptionForBiWeek2 = []
+
+                renderSchedule()
+                workingScheduleValidate( $(this).val() == "2" )
+            })
+
+            $('#offday_for_sheet').change( function() {
+                setOffShowing( $(this).val() == "0" )
+            })
+
+            $('#inclusive_wage').change( function() {
+                setInclusiveWageShowing( $(this).val() == "1" )
+            })
+
+            $('#contract_type').change( function() {
+                renderSchedule()
+                renderBenefit()
+
+                const daily = $(this).val() == "2"
+                // 일용직
+                if ( daily ) {
+                    showControl( true, "daily_schedule" )
+                    showControl( true, "daily_schedule2" )
+                    // if ( $('#daily_schedule').hasClass('hidden') ) {
+                    //     $('#daily_schedule').removeClass('hidden')
+                    //     $('#daily_schedule2').removeClass('hidden')
+                    // }
+
+                    $('#sallary_label').text( "일당 *")
+                } else {
+                    showControl( false, "daily_schedule" )
+                    showControl( false, "daily_schedule2" )
+                    // if ( $('#daily_schedule').hasClass('hidden') == false ) {
+                    //     $('#daily_schedule').addClass('hidden')
+                    //     $('#daily_schedule2').addClass('hidden')
+                    // }
+
+                    $('#sallary_label').text( "월급여 *")
+                }
+
+                // 수습여부, NET, NET 설명, 5인 사업장, 감당 여부, 계약 해지 추가 조항, 포괄산정, 근무타입, 주휴일, 월OFF갯수 숨기기
+                // 
+
+                showControl( daily == false, "rookie_container" )
+
+                if ( $('#rookie').val() != "0" ) {
+                    showControl( daily == false, "rookie_duration_container" )
+                    showControl( daily == false, "rookie_percent_container" )
+                }
+
+                showControl( daily == false, "net_container" )
+                showControl( daily == false, "over5_gamdan_container" )
+                showControl( daily == false, "fired_reason_container" )
+                showControl( daily == false, "inclusive_wage_container" )
+                showControl( daily == false, "working_schedule_container" )
+                
+                if ( $(this).val() == "3" ) {
+					<% if ( nomu.user.user_type == 0 ) { %>
+                        showControl( true, "contract_normal" )
+                        showControl( false, "contract_self" )
+                    <% } else { %>
+                        showControl( false, "contract_normal" )
+                        showControl( true, "contract_self" )
+                    <% } %>
+                } else {
+                    showControl( false, "contract_self" )
+                    showControl( true, "contract_normal" )
+                }
+            })
+
+            hideRookie()
+            netDescription( $('#net').val() == "1" )
+            workingScheduleValidate( $('#working_schedule').val() == "2" )
+
+            $('#sallary_day').val( "<%= nomu.user.pay_day %>" )
+
+            regDateControl( 'contract_start_date', '계약시작일' )
+            regDateControl( 'contract_end_date', '계약종료일' )
+            regDateControl( 'contract_writing_date', '계약서작성일' )
+
+            // // 정규직, 기간직일 경우.
+            //alert( "init_loading" )
+            renderSchedule()
+            renderBenefit()
+
+            initForm(inputs)
+        }
+        
+        jQuery(function ($) {
+            renderForm('contractFormRegular', '#contract_type_container', initRegularForm )
+        })
+
+        function sendPreview( id, email ) {
+            // 현재 API 문제로 잠시 빼 둠.
+            //putContract(2)
+
+            alert( "메일 API 점검 중.")
+        }
+
+        function previewContract( id, uri ) {
+            let viewer = "<%= config.path.was %>" + "assets/vendor/pdfjs-2.12.313-legacy-dist/web/viewer.html"
+            let query = "?file=" + /* uri */ "<%= config.path.rest %>" + "v1/util/file/" + uri
+            if ( uri && uri !== "" ) {
+                window.open( viewer + query )
+            } else {
+                showSpinner()
+
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/contract/" + id + "/preview",
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+                    let result = data
+                    if(result.success == 1){
+                        query = "?file=" + /* uri */ "<%= config.path.rest %>" + "v1/util/file/" + result.result.item.pdf_uri
+                        // ajax 이후
+                         window.open( viewer + query )
+                         reloadContractTable(table, setData)
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "미리보기 생성에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "미리보기 생성에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+            }
+        }
+
+
+        function editContract( id, worker_id ) {
+            if ( $('#editWorkerButtons').hasClass('hidden') ) {
+                togglePanelButton()
+            }
+
+            if (isCollapsePanel($('#contractPanel'))) {
+                $('#contractPanel').click()
+            }
+        
+            putWorker(worker_id, () => {
+                putContract(id)
+            })
+        }
+        
+        function addcontract() {
+            if (isCollapsePanel($('#contractPanel'))) {
+                $('#contractPanel').click()
+                return
+            }
+
+            let success = validateAll()
+            let othersSuccess = withOther() 
+
+            if ( success && othersSuccess ) {
+                
+                const body = getPostBody()
+
+                showSpinner()
+                $.ajax({
+                    type: "POST",
+                    url: "<%=config.path.rest%>v1/contract",
+                    data: body,    
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    let result = data
+                    if(result.success == 1){
+                        // 값들 다시 비우고, 접어.
+                        clear()
+                        $('#contractPanel').click()
+                        reloadContractTable(table, setData)
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+
+                    //alert( data.responseText )
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+                //prepareSubmit()
+            }
+        }
+
+
+        function doEditContract(id) {
+            if (isCollapsePanel($('#contractPanel'))) {
+                $('#contractPanel').click()
+                return
+            }
+
+            let success = validateAll()
+            let othersSuccess = withOther() 
+
+            if ( success && othersSuccess ) {
+                
+                const body = getPostBody()
+
+                showSpinner()
+                $.ajax({
+                    type: "PUT",
+                    url: "<%=config.path.rest%>v1/contract/" + id,
+                    data: body,    
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    let result = data
+                    if(result.success == 1){
+                        clear()
+                        togglePanelButton()
+                        if (isCollapsePanel($('#contractPanel')) == false) {
+                            $('#contractPanel').click()
+                        }
+                        reloadContractTable(table, setData)
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+
+                    //alert( data.responseText )
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+                //prepareSubmit()
+            }
+        }
+
+        function togglePanelButton() {
+            $('#editWorkerButtons').toggleClass('hidden')
+            $('#newWorkerButtons').toggleClass('hidden')
+
+            selectedWorkerId = -1
+        }
+
+        function clear() {
+            $('input, textarea').each(
+                function(index){  
+                    var input = $(this)
+                    input.val("")
+                }
+            )
+            $('select').each(
+                function(index){  
+                    var input = $(this)
+                    input.prop("selectedIndex", 0).trigger("change")
+                }
+            )
+            
+            scheduleOption = []
+            scheduleOptionForBiWeek2 = []
+
+            // 사본을 쓰던, 코드 정리를 하던 수정 필요.
+            benefits = [
+                { title: "식대", code: 0, value: 0 },
+                { title: "차량유지비", code: 1, value: 0 },
+                { title: "육아수당", code: 2, value: 0 },
+                { title: "직책수당", code: 3, value: 0 },
+                { title: "자격수당", code: 4, value: 0 },
+                { title: "기타제수당", code: 5, value: 0 },
+                { title: "연차수당", code: 6, value: 0 }
+            ]
+
+            // TODO: 여기 필요 없을수도.
+            renderForm('contractFormRegular', '#contract_type_container', initRegularForm)
+            // 정규직, 기간직일 경우.
+            // if ( $('#contract_type').val() == "0" || $('#contract_type').val() == "1" ) {
+            //     renderSchedule()
+            //     renderBenefit()
+            // } else {
+            //     clearForm('#schedule_container')
+            //     clearForm('#benefit_container')
+            // }
+            renderBenefit()
+        }
+
+        function validateAll() {
+            let ret = validateAllInputs(inputs)
+
+            if ( validateAddress() == false ) {
+                ret = false
+            }
+
+            return ret
+        }
+
+        function doCancelEdit() {
+            clear()
+            togglePanelButton()
+
+            if (isCollapsePanel($('#contractPanel'))==false) {
+                $('#contractPanel').click()
+            }
+        }
+
+        function cancelEdit() {
+            if ( confirm("수정을 취소하시겠습니까?") ) {
+                doCancelEdit()
+            }
+
+        }
+
+    </script>
+    <%- include( 'addressSearchScript' ) %>
+        <script src="assets/scripts/validate.js"></script>
+        <script>
+            let inputs = [
+                { id: "name", feedback_id: "name_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "idcard_number", feedback_id: "idcard_number_feedback", type: validate_types.idcard_number, minLen: 1, maxLen: 14, feedback: "형식을 확인해주세요.(ex: 111111-1111111)", required: true },
+                { id: "position", feedback_id: "position_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "part", feedback_id: "part_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "worked_on", feedback_id: "worked_on_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                // { id: "entered", feedback_id: "entered_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                // { id: "resigned", feedback_id: "resigned_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: false },
+                { id: "email", feedback_id: "email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+                { id: "contract_start_date", feedback_id: "contract_start_date_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                { id: "contract_end_date", feedback_id: "contract_end_date_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: false },
+                { id: "contract_writing_date", feedback_id: "contract_writing_date_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                { id: "sallary", feedback_id: "sallary_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "월급여를 입력해 주세요", required: true },
+                //{ id: "sallary_day", feedback_id: "sallary_day_feedback", type: validate_types.none, minLen: 1, maxLen: 2, feedback: "급여일을 입력해 주시거나 형태를 확인해 주세요.", required: true },
+            ]
+
+            let withOther = () => {
+
+                const period = $('#contract_type').val() == "1"
+
+                let entered = $('#contract_start_date').val()
+                let resigned = $('#contract_end_date').val()
+
+                if ( period == false && resigned != "" ) {
+                    alert( "계약종료일은 기간제 근로자만 작성")
+                    return false
+                }
+                
+                if ( entered != "" && resigned != "" && entered > resigned ) {
+                    $('#contract_end_date_feedback').text("계약종료일이 계약시작일보다 클 수 없습니다")
+                    return false
+                }
+                
+                let rookieInputs= [ 
+                    { id: "rookie_duration", feedback_id: "rookie_duration_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "수습기간을 입력해 주세요", required: true },
+                    { id: "rookie_percent", feedback_id: "rookie_percent_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "수습급여(%)를 입력해 주세요", required: true },
+                ]
+
+                if ( $('#rookie').val() == 1 ) {
+                    if ( validateAllInputs(rookieInputs) == false ) {
+                        return false
+                    }
+                } else {
+                    rookieInputs.forEach( (value) => {
+                        value.required = false
+                    })
+                    validateAllInputs(rookieInputs)
+                }
+
+                if ( validateStartEndTime() == false ) {
+                    return false
+                }
+
+                return true
+            }
+
+        </script>
+        <script>
+            // 수당 추가.
+            function addBenefit(title, next) {
+                if ( title == '' ) {
+                    alert( "추가할 수당 이름을 입력해 주세요." )
+                } else {
+                    if ( benefits.length + 1 > basicBenefitCount + 5 ) {
+                        alert( "최대 등록 가능 수당 수를 넘었습니다.")
+                    } else {
+                        const find = benefits.find((benefit) => benefit.title === title )
+                        if ( find ) {
+                            alert( "이미 존재하는 수당 입니다.")
+                        } else {
+                            benefits = benefits.concat( { title: title, code: benefits.length, value: 0 } )
+                            next()
+                            renderBenefit()
+                        }
+                    }
+                }
+            }
+
+            function removeBenefit(title) {
+                benefits = benefits.filter((benefit) => benefit.title !== title )
+                renderBenefit()
+            }
+        </script>
+        <script>
+
+            // //nomu.common.scheduleType.basic
+            // //nomu.common.scheduleType.biweekly
+            // //nomu.common.scheduleType.basic_option_day
+            // //nomu.common.scheduleType.biweekly_option_day
+
+            // let scheduleOption = [
+            //     //{ type: <%= nomu.common.scheduleType.basic %>, day: 0, startend: 0, rest1: 0, rest2: 0, rest3: 0 }
+            // ]
+            // let scheduleOptionForBiWeek2 = [
+            //     //{ type: <%= nomu.common.scheduleType.basic %>, day: 0, startend: 0, rest1: 0, rest2: 0, rest3: 0 }
+            // ]
+            
+            // 스케쥴 관련
+            function addSchedule( index ) {
+                if ( $('#working_schedule').val() == "1" ) {
+                    if ( index == 0 ) {
+                        scheduleOption = scheduleOption.concat( { type: <%= nomu.common.scheduleType.biweekly_option_day %>, day: "", startend: "", rest1: "", rest2: "", rest3: "" } ) 
+                    } else {
+                        scheduleOptionForBiWeek2 = scheduleOptionForBiWeek2.concat( { type: <%= nomu.common.scheduleType.biweekly_option_day %>, day: "", startend: "", rest1: "", rest2: "", rest3: "" } )
+                    }
+                } else {
+                    scheduleOption = scheduleOption.concat( { type: <%= nomu.common.scheduleType.basic_option_day %>, day: "", startend: "", rest1: "", rest2: "", rest3: "" } ) 
+                }
+                renderSchedule(getCurrentSchedule())
+            }
+
+            function removeSchedule( index ) {
+                //alert( JSON.stringify(scheduleOption ))
+                let currentSchedule = getCurrentSchedule()
+                if ( $('#working_schedule').val() == "1" ) {
+                    if ( index >= 2 + scheduleOption.length ) {
+                        index -= 2 + scheduleOption.length
+                        scheduleOptionForBiWeek2.splice( index, 1 )
+                    } else {
+                        index -= 1
+                        scheduleOption.splice( index, 1 )
+                    }
+                } else {
+                    index -= 1
+                    scheduleOption.splice( index, 1 )
+                }
+                //alert( JSON.stringify(scheduleOption ))
+                //alert( "!!!")
+                renderSchedule( currentSchedule )
+            }
+        </script>
+        <script>
+            function getScheduleObject( type, dayId, startendId, rest1Id, rest2Id, rest3Id, dayOptionId ) {
+                let day
+
+                // 일용직일 경우 1-7로 지정해 둔다.
+                if ( ($('#contract_type').val() == "2") ) {
+                    //alert("일용직")
+                    day = "17"
+                } else {
+                    day = ($('#' + dayId).val())
+                    //alert("일반")
+                }
+                let startend = ($('#' + startendId).val())
+                let rest1 = ($('#' + rest1Id).val())
+                let rest2 = ($('#' + rest2Id).val())
+                let rest3 = ($('#' + rest3Id).val())
+                let pattern
+
+                // 일용직일 경우 1-7로 지정해 둔다.
+                if ( ($('#contract_type').val() == "2") ) {
+                    pattern = "0"
+                } else {
+                    pattern = ($('#' + dayOptionId).val())
+                }
+
+                return { type: type, day: day, startend: startend, rest1: rest1, rest2: rest2, rest3: rest3, pattern: pattern }
+            }
+
+            function getPostBody() {
+                let workerBody = {}
+                let contractBody = {}
+                
+                $('input, textarea, select').each( function(index) {  
+                    var input = $(this)
+                    
+                    switch( input.attr('name') ) {
+                        case "worker_id":
+                            workerBody.id = input.val()
+                            break
+                        case "contract_id":
+                            contractBody.id = input.val()
+                            break
+                        case "name":
+                            workerBody.name = input.val()
+                            break
+                        case "idcard_number":
+                            workerBody.idcardNumber = input.val()
+                            break
+                        case "post_no":
+                            workerBody.postNo = input.val()
+                            break
+                        case "address":
+                            workerBody.address = input.val()
+                            break
+                        case "address_detail":
+                            workerBody.addressDetail = input.val()
+                            break
+                        case "part":
+                            contractBody.part = input.val()
+                            break
+                        case "position":
+                            contractBody.position = input.val()
+                            break
+                        case "worked_on":
+                            contractBody.workedOn = input.val()
+                            break
+                        case "contract_type":
+                            contractBody.contractType = input.val()
+                            break
+                        case "email":
+                            workerBody.email = input.val()
+                            break
+                        case "contract_start_date":
+                            contractBody.start_date = input.val()
+                            break
+                        case "contract_end_date":
+                            contractBody.end_date = input.val()
+                            break
+                        case "contract_writing_date":
+                            contractBody.writing_date = input.val()
+                            break
+                        case "rookie":
+                            contractBody.internship = input.val()
+                            break
+                        case "rookie_duration":
+                            contractBody.internship_duration = input.val()
+                            break
+                        case "rookie_percent":
+                            contractBody.internship_percent = input.val()
+                            break
+                        case "net":
+                            contractBody.net = input.val()
+                            break
+                        case "over5":
+                            contractBody.evenOver5 = input.val()
+                            break
+                        case "gamdan":
+                            contractBody.gamdan = input.val()
+                            break
+                        case "fired_reason":
+                            contractBody.option_description = input.val()
+                            break
+                        case "working_schedule":
+                            contractBody.working_type = input.val()
+                            break
+                        case "offday_for_sheet":
+                            contractBody.offday_type = input.val()
+                            break
+                        case "off_per_month":
+                            contractBody.offday_count_per_momth = input.val()
+                            break
+                        case "sallary":
+                            contractBody.sallary = input.val()
+                            break
+                        case "sallary_day":
+                            contractBody.sallary_day = Number(input.val())
+                            break
+                        case "inclusive_wage":
+                            contractBody.inclusive_wage = input.val()
+                            break
+                        case "benefit_holiday":
+                            contractBody.benefit_holiday = input.val()
+                            break
+                        case "benefit_over":
+                            contractBody.benefit_over = input.val()
+                            break
+                        case "benefit_night":
+                            contractBody.benefit_night = input.val()
+                            break
+                        case "benefit_over_holiday":
+                            contractBody.benefit_over_holiday = input.val()
+                            break
+                            // DB에 지금 필드 내용들 적용
+                            // DB 보면서 필드 이름들 맞추고, 시간 정보 테이블도 바꿔 주자.
+                        case "daily_mon":
+                            contractBody.daily_mon = (input.prop('checked') == true) ? 1: 0
+                            break
+                        case "daily_tue":
+                            contractBody.daily_tue = (input.prop('checked') == true) ? 1: 0
+                            break
+                        case "daily_wed":
+                            contractBody.daily_wed = (input.prop('checked') == true) ? 1: 0
+                            break
+                        case "daily_thu":
+                            contractBody.daily_thu = (input.prop('checked') == true) ? 1: 0
+                            break
+                        case "daily_fri":
+                            contractBody.daily_fri = (input.prop('checked') == true) ? 1: 0
+                            break
+                        case "daily_sat":
+                            contractBody.daily_sat = (input.prop('checked') == true) ? 1: 0
+                            break
+                        case "daily_sun":
+                            contractBody.daily_sun = (input.prop('checked') == true) ? 1: 0
+                            break
+                    }
+                })
+
+                contractBody.schedule = getScheduleObject( <%= nomu.common.scheduleType.basic %>, 'schedule_0', 'working_duration_0', 'off1_0', 'off2_0', 'off3_0', 'day_option_day_0' )
+                contractBody.schedule2 = {}
+
+                // alert( JSON.stringify(contractBody.schedule) )
+
+                let index = 1
+                contractBody.exceptSchedule = []
+                // alert( JSON.stringify(scheduleOption) )
+                scheduleOption.forEach( (option) => {
+                    contractBody.exceptSchedule = contractBody.exceptSchedule.concat( getScheduleObject( <%= nomu.common.scheduleType.basic_option_day %>, 'schedule_' + index, 'working_duration_' + index, 'off1_' + index, 'off2_' + index, 'off3_' + index, 'day_option_day_' + index ) )
+                    // alert( JSON.stringify(contractBody.exceptSchedule) )
+                    index++
+                })
+
+                // contractBody.exceptSchedule = scheduleOption
+                // contractBody.exceptSchedule2 = scheduleOptionForBiWeek2
+
+                // 격주
+                if ( $('#working_schedule').val() == "1" ) {
+                    // alert( "격주" )
+                    let biIndex = scheduleOption.length + 1
+                
+                    contractBody.schedule.type =  <%= nomu.common.scheduleType.biweekly %>
+                    contractBody.schedule2 = getScheduleObject( <%= nomu.common.scheduleType.biweekly %>, 'schedule_' + biIndex, 'working_duration_' + biIndex, 'off1_' + biIndex, 'off2_' + biIndex, 'off3_' + biIndex, 'day_option_day_' + biIndex )
+
+                    contractBody.exceptSchedule.forEach( (option) => {
+                        option.type = <%= nomu.common.scheduleType.biweekly_option_day %>
+                    })
+
+                    let index = biIndex + 1
+                    contractBody.exceptSchedule2 = []
+                    scheduleOptionForBiWeek2.forEach( (option) => {
+                        contractBody.exceptSchedule2 = contractBody.exceptSchedule2.concat( getScheduleObject( <%= nomu.common.scheduleType.biweekly_option_day %>, 'schedule_' + index, 'working_duration_' + index, 'off1_' + index, 'off2_' + index, 'off3_' + index, 'day_option_day_' + index ) )
+                        index++
+                    })
+                }
+
+                // alert( JSON.stringify( contractBody.schedule ) )
+                // alert( JSON.stringify( contractBody.schedule2 ) )
+                // alert( JSON.stringify( contractBody.exceptSchedule ) )
+                // alert( JSON.stringify( contractBody.exceptSchedule2 ) )
+                
+                benefits.forEach( (benefit) => {
+                    let value = $('#benefit_' + benefit.code).val()
+                    //alert( value + " " + benefit.code )
+                    value = value.replace( /,/g, '' )
+                    benefit.value = Number(value)
+                })
+                contractBody.benefits = benefits
+                // alert( JSON.stringify(workerBody) + "A" )
+                // alert( JSON.stringify(contractBody) )
+
+                return { worker: workerBody, contract: contractBody }
+            }
+        </script>
+        <script>
+
+            function convertScheduleItem( item ) {
+                let ret = { type: item.type, day: item.day_index, pattern: item.pattern, startend: "", rest1: "", rest2: "", rest3: "" }
+
+                let start = item.working_start
+                let end = item.working_end
+                if ( start > 0 && end > 0 ) {
+                    ret.startend = String(Math.floor(start/60)).padStart(2, '0') + ":" + String(start%60).padStart(2, '0') + "-" + String(Math.floor(end/60)).padStart(2, '0') + ":" + String(end%60).padStart(2, '0')
+                } else {
+                    ret.startend = ""
+                }
+                start = item.off1_start
+                end = item.off1_end
+                if ( start > 0 && end > 0 ) {
+                    ret.rest1 = String(Math.floor(start/60)).padStart(2, '0') + ":" + String(start%60).padStart(2, '0') + "-" + String(Math.floor(end/60)).padStart(2, '0') + ":" + String(end%60).padStart(2, '0')
+                } else {
+                    ret.rest1 = ""
+                }
+                start = item.off2_start
+                end = item.off2_end
+                if ( start > 0 && end > 0 ) {
+                    ret.rest2 = String(Math.floor(start/60)).padStart(2, '0') + ":" + String(start%60).padStart(2, '0') + "-" + String(Math.floor(end/60)).padStart(2, '0') + ":" + String(end%60).padStart(2, '0')
+                } else {
+                    ret.rest2 = ""
+                }
+                start = item.off3_start
+                end = item.off3_end
+                if ( start > 0 && end > 0 ) {
+                    ret.rest3 = String(Math.floor(start/60)).padStart(2, '0') + ":" + String(start%60).padStart(2, '0') + "-" + String(Math.floor(end/60)).padStart(2, '0') + ":" + String(end%60).padStart(2, '0')
+                } else {
+                    ret.rest3 = ""
+                }
+
+                return ret
+            }
+
+            // 스케쥴 컨버팅 관련 쓰레기 코드... 기획만 제대로 였어도 이지랄 안 났는데 ㅠㅠ
+            function convertSchedule( scheduleObject ) {
+                let schedules = []
+                let contractBody = {}
+
+
+                // 잠깐만... 존나 좆같네.......
+                // (1) first, second, third, fourth 하나의 배열로 concat. 격주는 first, second / third, fourth
+                // (2) 거기서 기본 타입, 격주 타입 찾음. 0, 10.
+                // (3) 옵션 값들 중복 빼고 모두 넣어 줌. ( schedule1, 2 나눈다 여기서도.)
+
+                let fullArray = []
+                fullArray = fullArray.concat( scheduleObject.firstWeek )
+                fullArray = fullArray.concat( scheduleObject.secondWeek )
+                fullArray = fullArray.concat( scheduleObject.thirdWeek )
+                fullArray = fullArray.concat( scheduleObject.fourthWeek )
+
+                //alert( JSON.stringify(fullArray) )
+
+                if ( fullArray.find( (item) => item.type == <%= nomu.common.scheduleType.biweekly %> )) {
+                    // 격주
+                    //alert( "격주" )
+                    let halfArray = []
+                    halfArray = halfArray.concat( scheduleObject.firstWeek )
+                    halfArray = halfArray.concat( scheduleObject.thirdWeek )
+                    let halfArray2 = []
+                    halfArray2 = halfArray2.concat( scheduleObject.secondWeek )
+                    halfArray2 = halfArray2.concat( scheduleObject.fourthWeek )
+
+                    let item = halfArray.find( (item) => item.type == <%= nomu.common.scheduleType.biweekly %> )
+                    if ( item ) {
+                        schedules = schedules.concat( convertScheduleItem(item) )  
+                    }
+                    item = halfArray2.find( (item) => item.type == <%= nomu.common.scheduleType.biweekly %> )
+                    if ( item ) {
+                        schedules = schedules.concat( convertScheduleItem(item) )  
+
+                        options = halfArray.filter( (item) => item.type == <%= nomu.common.scheduleType.biweekly_option_day %> )
+                        scheduleOption = []
+                        options.forEach( ( item ) => {
+                            // 중복되면 안됨.
+                            if ( scheduleOption.pattern != item.pattern || 
+                                    scheduleOption.day != item.day || 
+                                    scheduleOption.startend != item.startend || 
+                                    scheduleOption.rest1 != item.rest1 || 
+                                    scheduleOption.rest2 != item.rest2 || 
+                                    scheduleOption.rest3 != item.rest3 ) {
+                                scheduleOption = scheduleOption.concat( convertScheduleItem(item) )
+                            }
+                        })
+
+                        options = halfArray2.filter( (item) => item.type == <%= nomu.common.scheduleType.biweekly_option_day %> )
+                        scheduleOptionForBiWeek2 = []
+                        options.forEach( ( item ) => {
+                            // 중복되면 안됨.
+                            if ( scheduleOptionForBiWeek2.pattern != item.pattern || 
+                                    scheduleOptionForBiWeek2.day != item.day || 
+                                    scheduleOptionForBiWeek2.startend != item.startend || 
+                                    scheduleOptionForBiWeek2.rest1 != item.rest1 || 
+                                    scheduleOptionForBiWeek2.rest2 != item.rest2 || 
+                                    scheduleOptionForBiWeek2.rest3 != item.rest3 ) {
+                                scheduleOptionForBiWeek2 = scheduleOptionForBiWeek2.concat( convertScheduleItem(item) )
+                            }
+                        })
+                    }
+                } else {
+                    //alert( "격주X" )
+                    let item = fullArray.find( (item) => item.type == <%= nomu.common.scheduleType.basic %> )
+                    if ( item ) {
+                        schedules = schedules.concat( convertScheduleItem(item) )  
+
+                        options = fullArray.filter( (item) => item.type == <%= nomu.common.scheduleType.basic_option_day %> )
+                        scheduleOption = []
+                        options.forEach( ( item ) => {
+
+                            let converted = convertScheduleItem(item)
+
+                            // 중복되면 안됨.
+                            let find = false
+                            scheduleOption.forEach( (src) => {
+                                if ( src.pattern == converted.pattern &&
+                                        src.day == converted.day &&
+                                        src.startend == converted.startend &&
+                                        src.rest1 == converted.rest1 &&
+                                        src.rest2 == converted.rest2 && 
+                                        src.rest3 == converted.rest3 ) {
+                                    find = true
+                                    return false
+                                }
+                            })
+
+                            //alert( find )
+                            if ( find == false ) {
+                                scheduleOption = scheduleOption.concat( converted )
+                            }
+                        })
+                    }
+
+                    
+                }
+                //alert( JSON.stringify(schedules) )
+
+                // contractBody.schedule = { type: <%= nomu.common.scheduleType.basic %>, day: 0, startend: 0, rest1: 0, rest2: 0, rest3: 0 }
+                // contractBody.schedule2 = {}
+
+                // let index = 1
+                // contractBody.exceptSchedule = []
+                // scheduleOption.forEach( (option) => {
+                //     contractBody.exceptSchedule = contractBody.exceptSchedule.concat( getScheduleObject( <%= nomu.common.scheduleType.basic_option_day %>, 'schedule_' + index, 'working_duration_' + index, 'off1_' + index, 'off2_' + index, 'off3_' + index, 'day_option_day_' + index ) )
+                //     index++
+                // })
+                // // contractBody.exceptSchedule = scheduleOption
+                // // contractBody.exceptSchedule2 = scheduleOptionForBiWeek2
+
+                // // 격주
+                // if ( $('#working_schedule').val() == "1" ) {
+                //     let biIndex = scheduleOption.length + 1
+                
+                //     contractBody.schedule.type =  <%= nomu.common.scheduleType.biweekly %>
+                //     contractBody.schedule2 = getScheduleObject( <%= nomu.common.scheduleType.biweekly %>, 'schedule_' + biIndex, 'working_duration_' + biIndex, 'off1_' + biIndex, 'off2_' + biIndex, 'off3_' + biIndex, 'day_option_day_' + biIndex )
+
+                //     contractBody.exceptSchedule.forEach( (option) => {
+                //         option.type = <%= nomu.common.scheduleType.biweekly_option_day %>
+                //     })
+
+                //     let index = biIndex + 1
+                //     contractBody.exceptSchedule2 = []
+                //     scheduleOptionForBiWeek2.forEach( (option) => {
+                //         contractBody.exceptSchedule2 = contractBody.exceptSchedule2.concat( getScheduleObject( <%= nomu.common.scheduleType.biweekly_option_day %>, 'schedule_' + index, 'working_duration_' + index, 'off1_' + index, 'off2_' + index, 'off3_' + index, 'day_option_day_' + index ) )
+                //         index++
+                //     })
+                // }
+
+                // schedules = schedules.concat( contractBody.schedule )
+                // schedules = schedules.concat( contractBody.schedule2 )
+
+                // scheduleOption = contractBody.exceptSchedule
+                // scheduleOptionForBiWeek2 = contractBody.exceptSchedule2
+
+                return schedules
+            }
+
+            function getCurrentSchedule() {
+                let schedules = []
+                let contractBody = {}
+
+                contractBody.schedule = getScheduleObject( <%= nomu.common.scheduleType.basic %>, 'schedule_0', 'working_duration_0', 'off1_0', 'off2_0', 'off3_0', 'day_option_day_0' )
+                contractBody.schedule2 = {}
+
+                let index = 1
+                contractBody.exceptSchedule = []
+                scheduleOption.forEach( (option) => {
+                    contractBody.exceptSchedule = contractBody.exceptSchedule.concat( getScheduleObject( <%= nomu.common.scheduleType.basic_option_day %>, 'schedule_' + index, 'working_duration_' + index, 'off1_' + index, 'off2_' + index, 'off3_' + index, 'day_option_day_' + index ) )
+                    index++
+                })
+                // contractBody.exceptSchedule = scheduleOption
+                // contractBody.exceptSchedule2 = scheduleOptionForBiWeek2
+
+                // 격주
+                if ( $('#working_schedule').val() == "1" ) {
+                    let biIndex = scheduleOption.length + 1
+                
+                    contractBody.schedule.type =  <%= nomu.common.scheduleType.biweekly %>
+                    contractBody.schedule2 = getScheduleObject( <%= nomu.common.scheduleType.biweekly %>, 'schedule_' + biIndex, 'working_duration_' + biIndex, 'off1_' + biIndex, 'off2_' + biIndex, 'off3_' + biIndex, 'day_option_day_' + biIndex )
+
+                    contractBody.exceptSchedule.forEach( (option) => {
+                        option.type = <%= nomu.common.scheduleType.biweekly_option_day %>
+                    })
+
+                    let index = biIndex + 1
+                    contractBody.exceptSchedule2 = []
+                    scheduleOptionForBiWeek2.forEach( (option) => {
+                        contractBody.exceptSchedule2 = contractBody.exceptSchedule2.concat( getScheduleObject( <%= nomu.common.scheduleType.biweekly_option_day %>, 'schedule_' + index, 'working_duration_' + index, 'off1_' + index, 'off2_' + index, 'off3_' + index, 'day_option_day_' + index ) )
+                        index++
+                    })
+                }
+
+                schedules = schedules.concat( contractBody.schedule )
+                schedules = schedules.concat( contractBody.schedule2 )
+
+                scheduleOption = contractBody.exceptSchedule
+                scheduleOptionForBiWeek2 = contractBody.exceptSchedule2
+
+                return schedules
+            }
+        </script>
+        <script>
+            const uploadExcelButton = () => {
+                $('#excel').click()
+            }
+
+            const uploadExcel = () => {
+                // alert( "값들의 정확한 입력을 위한 추가 코드 작성 중입니다. 내일 오전 중 재 오픈 하겠습니다.")
+                // return
+                
+                showSpinner()
+
+                var form = $('#excelForm')[0];  	 
+                //alert( JSON.stringify(form) )
+                // Create an FormData object          
+                var data = new FormData(form);    
+                //alert( JSON.stringify(data) )
+
+                // TODO: IE10 이하에서 FormData 때문에 안 될 수 있으니 확인 필요.. 근데 어짜피 서명 쪽 캔버스 쓰려면 IE10 미만 지원이 되려나..
+                $.ajax({
+                    type: "POST",
+                    url: "<%=config.path.rest%>v1/contract/excel",
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                    enctype: 'multipart/form-data',          
+                    data: data,          
+                    processData: false,    
+                    contentType: false,      
+                    cache: false,           
+                    timeout: 600000, 
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    let result = data
+                    reloadContractTable(table, setData)
+                    clear()
+                    // TODO: worker 들 contract 로 변경. ( 현재는 테스트 기간이므로 보류 )
+                    if ( $('#newWorkerButtons').hasClass('hidden') ) {
+                        togglePanelButton()
+                    }
+                    if (isCollapsePanel($('#workerPanel'))==false) {
+                        $('#workerPanel').click()
+                    }
+                    
+                    if(result.success == 1){
+                            alert( "엑셀 입력에 성공하였습니다." )
+                    } else {
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "엑셀 입력에 실패하였습니다. 입력 폼을 확인해 주세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+                    
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "통신에 실패하였습니다" )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+
+                // TODO 작업 완료 후, 인풋 필드 클리어. 또한 이 함수에선 시작 시 인풋 필드 비어있는지 체크해서 비었으면 리턴.
+            }
+
+            const downloadExcel = () => {
+                // alert( "값들의 정확한 입력을 위한 추가 코드 작성 중입니다. 내일 오전 중 재 오픈 하겠습니다.")
+                // return
+
+                showSpinner()
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/contract/excel",
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                    xhrFields:{
+                        responseType: 'blob'
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    const fileName = "contract.xlsx"
+                    if (window.navigator.msSaveOrOpenBlob) {
+                        window.navigator.msSaveBlob(data, fileName);
+                        return;
+                    }
+                    const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel;"})
+                    const path = (window.URL ? URL : webkitURL).createObjectURL(blob);
+                    const link = document.createElement('a')
+                    link.href = path
+                    link.download = fileName
+                    link.click();
+                    (window.URL ? URL : webkitURL).revokeObjectURL(path)
+                    link.remove()
+
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+                    alert( "엑셀 다운로드에 실패하였습니다. 관리자에게 문의하세요." )
+                    
+                });
+            }
+        </script>
+    </html>

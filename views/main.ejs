@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head', { title: "" } ) %>
+<body>
+	<!-- WRAPPER -->
+	<div id="wrapper">
+		<!-- NAVBAR -->
+		<nav class="navbar navbar-default navbar-fixed-top">
+			<div class="brand">
+				<a href="main"><img src="assets/img/logo-dark.png" alt="DrNomu Logo" class="img-responsive logo"></a>
+			</div>
+			<div class="container-fluid">
+				<div class="navbar-btn">
+					<button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
+				</div>
+				<!-- <form class="navbar-form navbar-left">
+					<div class="input-group">
+						<input type="text" value="" class="form-control" placeholder="Search dashboard...">
+						<span class="input-group-btn"><button type="button" class="btn btn-primary">Go</button></span>
+					</div>
+				</form> -->
+				<!-- <div class="navbar-btn navbar-btn-right">
+					<a class="btn btn-success update-pro" href="https://www.themeineed.com/downloads/DrNomu-pro-bootstrap-admin-dashboard-template/?utm_source=DrNomu&utm_medium=template&utm_campaign=DrNomuPro" title="Upgrade to Pro" target="_blank"><i class="fa fa-rocket"></i> <span>UPGRADE TO PRO</span></a>
+				</div> -->
+				<div id="navbar-menu">
+					<ul class="nav navbar-nav navbar-right">
+                        <!--
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+								<i class="lnr lnr-alarm"></i>
+								<span class="badge bg-danger">5</span>
+							</a>
+							<ul class="dropdown-menu notifications">
+								<li><a href="#" class="notification-item"><span class="dot bg-warning"></span>System space is almost full</a></li>
+								<li><a href="#" class="notification-item"><span class="dot bg-danger"></span>You have 9 unfinished tasks</a></li>
+								<li><a href="#" class="notification-item"><span class="dot bg-success"></span>Monthly report is available</a></li>
+								<li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Weekly meeting in 1 hour</a></li>
+								<li><a href="#" class="notification-item"><span class="dot bg-success"></span>Your request has been approved</a></li>
+								<li><a href="#" class="more">See all notifications</a></li>
+							</ul>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="lnr lnr-question-circle"></i> <span>Help</span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>
+							<ul class="dropdown-menu">
+								<li><a href="#">Basic Use</a></li>
+								<li><a href="#">Working With Data</a></li>
+								<li><a href="#">Security</a></li>
+								<li><a href="#">Troubleshooting</a></li>
+							</ul>
+						</li>
+                        -->
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown"> <!--<img src="assets/img/user.png" class="img-circle" alt="Avatar">--><i class="lnr lnr-user"></i> <span><%=nomu.user.name%></span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:showCompanyDetail( <%= nomu.user.user_id %> )"><i class="lnr lnr-user"></i> <span>내 업체 정보</span></a></li>
+								<!-- <li><a href="#"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li> -->
+								<!-- <li><a href="#"><i class="lnr lnr-cog"></i> <span>Settings</span></a></li> -->
+								<li><a href="signOut"><i class="lnr lnr-exit"></i> <span>로그아웃</span></a></li>
+							</ul>
+						</li>
+						<!-- <li>
+							<a class="update-pro" href="https://www.themeineed.com/downloads/DrNomu-pro-bootstrap-admin-dashboard-template/?utm_source=DrNomu&utm_medium=template&utm_campaign=DrNomuPro" title="Upgrade to Pro" target="_blank"><i class="fa fa-rocket"></i> <span>UPGRADE TO PRO</span></a>
+						</li> -->
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!-- END NAVBAR -->
+		<!-- LEFT SIDEBAR -->
+		<div id="sidebar-nav" class="sidebar">
+			<div class="sidebar-scroll">
+				<nav>
+					<ul class="nav">
+						<li>
+                            <a href="#" class="" id='workerList'>
+                                <i class="lnr lnr-users"></i> <span>근로자명부</span>
+                            </a>
+                        </li>
+						<li>
+                            <a href="#" class="" id='contractList'>
+                                <i class="lnr lnr-pencil"></i> <span>근로계약서</span>
+                            </a>
+                        </li>
+						<li>
+                            <a href="#" class="" id='payrollBookkeeper'>
+                                <i class="lnr lnr-file-empty"></i> <span>임금대장</span>
+                            </a>
+                        </li>
+						<li>
+                            <a href="#" class="" id='laborBookkeeper'>
+                                <i class="lnr lnr-file-empty"></i> <span>일용노무대장</span>
+                            </a>
+                        </li>
+						<!-- 미오픈 -->
+						<!-- <li>
+                            <a href="#" class="" id='dayOffBookkeeper'>
+                                <i class="lnr lnr-file-empty"></i> <span>연차대장</span>
+                            </a>
+                        </li>
+						<li>
+                            <a href="#" class="" id='majorInsurance'>
+                                <i class="lnr lnr-inbox"></i> <span>4대보험</span>
+                            </a>
+                        </li> -->
+						<li>
+                            <a href="#" class="" id='downloadForms'>
+                                <i class="lnr lnr-download"></i> <span>서식다운로드</span>
+                            </a>
+                        </li>
+						<% if ( nomu.user.user_type == 0 ) { %>
+						<li>
+							<a href="#" class="" id='manageCompany'>
+								<i class="lnr lnr-user"></i> <span>업체관리</span>
+							</a>
+						</li>
+						<% } %>
+						<!-- <li>
+							<a href="#subPages" data-toggle="collapse" class="collapsed">
+                                <i class="lnr lnr-file-empty"></i> 
+                                <span>근로자명부</span> 
+                                <i class="icon-submenu lnr lnr-chevron-left"></i>
+                            </a>
+							<div id="subPages" class="collapse ">
+								<ul class="nav">
+									<li><a href="#" class="">목록조회</a></li>
+									<li><a href="#" class="">근로자명부 등록</a></li>
+								</ul>
+							</div>
+						</li> -->
+					</ul>
+				</nav>
+			</div>
+		</div>
+		<!-- END LEFT SIDEBAR -->
+		<!-- MAIN -->
+        <embed type="text/html" class="main" id="mainContentContainer">
+		
+		
+		<div class="clearfix"></div>
+		<footer>
+			<div class="container-fluid">
+				<p class="copyright">모든 권리는 <i class="fa fa-love"></i><a href="">노무박사</a> 에게 있습니다.
+</p>
+			</div>
+		</footer>
+	</div>
+	<!-- END WRAPPER -->
+	<%- include( 'modal', { id: "detail", content: "companyDetailContent", isLarge: 1 /*, isJoin: 0, isEditable: 0*/ } ) %>
+	<%- include( 'modal', { id: "workerList", content: "workerListDataTableModalContent", isLarge: 1 } ) %>
+	<%- include( 'modal', { id: "contractList", content: "contractListDataTableModalContent", isLarge: 1 } ) %>
+</body>
+
+    <%- include( 'workerListDataTableScript' ) %>
+	<%- include( 'contractListDataTableScript' ) %>
+	<!-- Javascript -->
+	<script src="assets/vendor/jquery/jquery.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/vendor/footable/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Add in any FooTable dependencies we may need -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+	<script src="assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="assets/scripts/klorofil-common.js"></script>
+	<script src="assets/scripts/nomu-common.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <!-- FOO TABLE 필요시 모듈화 -->
+    <script src="assets/vendor/footable/js/footable.min.js"></script>
+	<%- include( 'companyFormScript' ) %>
+	<%- include( 'addressSearchScript' ) %>
+	<script src="assets/scripts/validate.js"></script>
+	<script>
+		let inputs = [
+			{ id: "password", feedback_id: "password_feedback", type: validate_types.password, minLen: 8, maxLen: 25, feedback: "숫자, 대소문자영어, 특수문자 포함하여 입력해주세요.(8-25자)", required: true },
+			{ id: "name", feedback_id: "name_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+			{ id: "business_number", feedback_id: "business_number_feedback", type: validate_types.business_number, minLen: 1, maxLen: 12, feedback: "형식을 확인해주세요.(ex: 111-11-11111)", required: true },
+			{ id: "boss_name", feedback_id: "boss_name_feedback", type: validate_types.none, minLen: 1, maxLen: 50, feedback: "대표님의 성함을 입력해주세요.(1-100자)", required: true },
+			{ id: "tel", feedback_id: "tel_feedback", type: validate_types.tel, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 032-111-11111)", required: true },
+			{ id: "fax", feedback_id: "fax_feedback", type: validate_types.tel, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 032-111-11111)", required: false },
+			{ id: "admin_name", feedback_id: "admin_name_feedback", type: validate_types.none, minLen: 1, maxLen: 50, feedback: "담당자분의 성함을 입력해주세요.(1-100자)", required: true },
+			{ id: "admin_hp", feedback_id: "admin_hp_feedback", type: validate_types.hp, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 010-111-11111)", required: true },
+			{ id: "admin_email", feedback_id: "admin_email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+		]
+		let othersValidate = () => {
+			return true
+		}
+	</script>
+	<script>
+		let menus = [
+            'workerList',
+            'contractList',
+            'payrollBookkeeper',
+            'laborBookkeeper',
+            'dayOffBookkeeper',
+            'majorInsurance',
+            'downloadForms',
+			<% if ( nomu.user.user_type == 0 ) { %>
+			'manageCompany',
+			<% } %>
+        ]
+
+		jQuery(function($){
+            menus.forEach( (menu) => {
+                $('#' + menu).click(function(e) { 
+					e.preventDefault()
+
+                    menus.forEach( (other) => {
+						if ( $('#' + other).hasClass('active') ) {
+                        	$('#' + other).removeClass('active')
+						}
+                    })
+
+					if ( $('#' + menu).hasClass('active') == false ) {
+						$('#' + menu).addClass('active');
+                    	$('#mainContentContainer').attr( 'src', menu )
+					}
+                })    
+            })
+
+			$('#' + menus[0]).addClass('active');
+            $('#mainContentContainer').attr( 'src', menus[0] )
+
+		})
+	</script>
+	<script>
+		function showCompanyDetail(id) {
+			$.ajax({
+				type: "GET",
+				url: "<%=config.path.rest%>v1/company/" + id,
+                headers: {
+					'Authorization': 'Bearer ' + '<%= nomu.token %>',
+				},  
+			}).done(function (data, textStatus, xhr) {
+				let result = data
+				if(result.success == 1){
+					const item = result.result.item
+
+					clearForm()
+					let editable = <%= nomu.user.user_id %> == id
+					if ( editable ) {
+						$('#detail_title').text( "내 업체 정보")
+						if ( $('#selfdrop_button').hasClass("hidden") && <%= nomu.user.user_type %> != 0 && <%= nomu.user.user_id %> == id ) {
+							$('#selfdrop_button').removeClass("hidden")
+						}
+						if ( $('#submit_button').hasClass("hidden") ) {
+							$('#submit_button').removeClass("hidden")
+						}
+						if ( $('#detail_footer').hasClass("hidden") ) {
+							$('#detail_footer').removeClass("hidden")
+						}
+						detail_footer
+						$('#submit_button').text("수정")
+
+						$('#detail_input_info').removeClass('hidden')
+						$('#stamp_picture').removeClass('hidden')
+						$('#detail_password_row').removeClass('hidden')
+
+						$('#user_id').val(id)
+					} else {
+						$('#detail_title').text( item.name + " 업체 정보")
+						if ( $('#detail_footer').hasClass("hidden") == false ) {
+							$('#detail_footer').addClass("hidden")
+						}
+
+						readonlyForm()
+						
+						$('#detail_input_info').addClass('hidden')
+						$('#stamp_picture').addClass('hidden')
+						$('#detail_password_row').addClass('hidden')
+					}
+					
+					$('#email_id').val( item.email_id )
+					$('#stamp_picture_url').val( item.stamp_picture )
+					$('#name').val( item.name )
+					$('#business_number').val( item.business_number )
+					$('#boss_name').val( item.boss_name )
+					$('#tel').val( item.phone )
+					$('#fax').val( item.fax )
+					$('#post_no').val( item.post_no )
+					$('#address').val( item.address )
+					$('#address_detail').val( item.address_detail )
+					$('#admin_name').val( item.admin_name )
+					$('#admin_hp').val( item.admin_phone )
+					$('#admin_email').val( item.email )
+					$('#pay_day').val( item.pay_day )
+					$('#pay_calc_day').val( item.pay_calc_day )
+
+					// 가입의 실제 폼은 여기서 구성된다.
+					initForm(inputs)
+					initFormPasswordConfirm()
+					// 업체 정보 로딩될 경우 이후 수행.
+					setStampPrev()
+					$('#detailModal').modal({
+						show: 'true'
+					})
+				} else {	
+					alert( result.errMsg )
+				}
+			}).fail(function(data, textStatus, errorThrown){
+				let result = eval("("+data.responseText+")")
+
+                if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+					alert( "네트워크 오류입니다." )
+				} else {
+					alert( result.errMsg )
+				}
+			});
+		}
+
+		function clearForm() {
+			$('#companyForm input').each(
+				function(index){  
+					var input = $(this)
+					input.val("")
+					input.attr("readonly",false)
+					if ( input.hasClass('input-readonly-noborder') ) {
+						input.removeClass('input-readonly-noborder')
+					}
+				}
+			)
+			$('#companyForm select').each(
+				function(index){  
+					var select = $(this)        
+					select.attr("disabled",false)
+				}
+			)
+			$('#companyForm button').each(
+				function(index){  
+					var btn = $(this)        
+					if ( btn.hasClass('hidden' ) ) {
+						btn.removeClass('hidden')
+					}
+				}
+			)
+
+			$('#email_id_parent').removeClass('input-group')
+			$('#email_id').attr("readonly",true)  
+			if ( $('#email_id').hasClass('input-readonly-noborder') == false ) {
+				$('#email_id').addClass('input-readonly-noborder')
+			}
+			$('#detail_check_id').addClass('hidden')
+			$('#post_no_parent').addClass('input-group')
+		}
+
+		function readonlyForm() {
+			$('#companyForm input').each(
+				function(index){  
+					var input = $(this)        
+					if ( input.hasClass('input-readonly-noborder') == false ) {
+						input.addClass('input-readonly-noborder')
+					}
+				}
+			)
+			$('#companyForm button').each(
+				function(index){  
+					var btn = $(this)        
+					if ( btn.hasClass('hidden') == false ) {
+						btn.addClass('hidden')
+					}
+				}
+			)
+			$('#companyForm select').each(
+				function(index){  
+					var select = $(this)        
+					select.attr("disabled",true)
+				}
+			)
+
+			$('#email_id_parent').removeClass('input-group')
+			$('#post_no_parent').removeClass('input-group')
+		}
+
+        function selfBlock() {
+            // 확인 팝업으로 대체.
+            if ( confirm("정말 회원을 탈퇴하시겠습니까?\n탈퇴 처리에 관한 메일이 발송 됩니다.") ) {
+                $.ajax({
+                    type: "PUT",
+                    url: "<%=config.path.rest%>v1/auth/drop/" + <%= nomu.user.user_id %>,
+					data: { email: '<%= nomu.user.email %>' },
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        location.href = 'signOut'
+                    } else {	
+                        alert( result.errMsg )
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "네트워크 오류입니다." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+            }
+        }
+	</script>
+    <script>
+        let selectedUserId = '<%= nomu.user.user_id %>'
+        let workerListTable = {}
+		let contractListTable = {}
+
+        jQuery(function ($) {
+            workerListTable = FooTable.init('#workerListTable', modalTableSetting)
+            contractListTable = FooTable.init('#contractListTable', modalContractTableSetting)
+			
+        });
+
+        function showWorkerList(next) {
+            reloadTable(workerListTable, setData)
+
+            $('#workerListModal').modal({
+                show: 'true'
+            })
+
+			$("#workerListTable").off("click", "tr")
+			$("#workerListTable").on("click", "tr", (e) => {
+				const id = $(e.target.parentElement).find('td:first').text()
+
+				if ( id != "" ) {
+					$('#workerListModal').modal('hide')
+					
+					next(id)
+				}
+				
+			})
+
+			$("#workerListTable").off("expand.ft.row")
+			// 확장 이벤트 클릭으로 대체.
+			$("#workerListTable").on("expand.ft.row", function (e, ft, row) {
+				// var EmployeeId = row.value.id //Access data from a specific column
+				// alert( EmployeeId )
+
+				e.preventDefault();
+			})
+        }
+
+        function showContractList(next) {
+            reloadContractTable(contractListTable, setContractData)
+
+            $('#contractListModal').modal({
+                show: 'true'
+            })
+
+			$("#contractListTable").off("click", "tr")
+			$("#contractListTable").on("click", "tr", (e) => {
+				const id = $(e.target.parentElement).find('td:first').text()
+
+				if ( id != "" ) {
+					$('#contractListModal').modal('hide')
+					
+					next(id)
+				}
+				
+			})
+
+			$("#contractListTable").off("expand.ft.row")
+			// 확장 이벤트 클릭으로 대체.
+			$("#contractListTable").on("expand.ft.row", function (e, ft, row) {
+				// var EmployeeId = row.value.id //Access data from a specific column
+				// alert( EmployeeId )
+
+				e.preventDefault();
+			})
+        }
+
+        function setData( table, list ) {
+            list.map((item) => {
+				
+				item.nameTag = item.name
+
+                switch( item.worker_type ) {
+                    case 0:
+                        item.worker_type = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.normal) %>'
+                        break
+                    case 1:
+                        item.worker_type = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.duration) %>'
+                        break
+                    case 2:
+                        item.worker_type = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.daily) %>'
+                        break
+                    default:
+                        break
+                }
+                
+                item.gender = item.idcard_number.substring( 7,8 ) == "1" ? "남자" : "여자"
+                
+                return item
+            })
+            table.rows.load(list)
+        }
+
+        function setContractData( table, list ) {
+            list.map((item) => {
+				
+				item.nameTag = item.name
+
+                switch( item.contractType ) {
+                    case 0:
+                        item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.normal) %>'
+                        break
+                    case 1:
+                        item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.duration) %>'
+                        break
+                    case 2:
+                        item.constract_type_string = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.daily) %>'
+                        break
+                    default:
+                        item.constract_type_string = '셀프작성'
+                        break
+                }
+
+                return item
+            })
+            table.rows.load(list)
+        }
+    </script>
+
+</html>

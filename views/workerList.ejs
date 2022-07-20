@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head' , { title: "" } ) %>
+
+    <body>
+        <div class="main-content">
+            <div class="container-fluid">
+                <h3 class="page-title">
+                    근로자명부
+                </h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="">
+                            <button type="button" class="btn btn-primary btn-excel" onclick="javascript:uploadExcelButton()"><i
+                                    class="fa fa-upload"></i> 엑셀 입력하기</button>
+                            <button type="button" class="btn btn-success btn-excel" download onclick="javascript:downloadExcel()"><i
+                                    class="fa fa-download"></i> 엑셀 다운로드</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- PANEL DEFAULT -->
+                        <div id="detailPanel" class="panel hidden">
+                            <div class="panel-heading">
+                                <div class="right">
+                                    <button type="button" id="workerPanel" class="btn-toggle-collapse"><i
+                                            class="lnr lnr-chevron-up"></i></button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <%- include( 'workerDetailContent' , { title: "" } ) %>
+                            </div>
+                            <div class="panel-footer panel-footer-right form-inline">
+                                <div class="form-inline" id="newWorkerButtons">
+                                    <buttontype="button" class="btn btn-primary" onclick="javascript:addWorker()"><i
+                                            class="fa fa-user"></i> 근로자 등록</button>
+                                </div>
+                                <div class="form-inline hidden" id="editWorkerButtons">
+                                    <button type="button" class="btn btn-danger pull-left" onclick="javascript:deleteWorker()">삭제</button>
+                                    <button id="newWorker" type="button" class="btn btn-primary" onclick="javascript:doEdit()">수정</button>
+                                    <button type="button" class="btn"
+                                        onclick="javascript:cancelEdit()">취소</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END PANEL DEFAULT -->
+                    </div>
+                </div>
+
+                <%- include( 'workerListDataTable', { id: "table" } ) %>
+            </div>
+            <%- include( 'spinner' ) %>
+        </div>
+        <form id="excelForm" action="uploadWorkerExcel" method="POST">
+            <input type="file" id="excel" name="excel" class="hidden" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onchange="javascript:uploadExcel()"/>
+        </form>
+    </body>
+
+    <!-- Javascript -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/vendor/footable/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Add in any FooTable dependencies we may need -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+    <script src="assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="assets/scripts/klorofil-common.js"></script>
+    <script src="assets/scripts/nomu-common.js"></script>
+    <script src="assets/scripts/nomu-common-control.js"></script>
+    <!-- FOO TABLE 필요시 모듈화 -->
+    <script src="assets/vendor/footable/js/footable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js" integrity="sha512-L4qpL1ZotXZLLe8Oo0ZyHrj/SweV7CieswUODAAPN/tnqN3PA1P+4qPu5vIryNor6HQ5o22NujIcAZIfyVXwbQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <%- include( 'workerListDataTableScript' ) %>
+    <script>
+        let table = {}
+
+        jQuery(function ($) {
+
+            table = FooTable.init('#table', tableSetting)
+
+            reloadTable(table, setData)
+
+            hidePanelOnStart($('#workerPanel'))
+            $('#detailPanel').toggleClass('hidden')
+
+            clear()
+        });
+
+        function setData( table, list ) {
+            list.map((item) => {
+                item.nameTag = "\
+                    <div class='btn-group'>\
+                    <a href='javascript:editWorker(" + item.id + ")'>" + item.name + "<span class='caret'></span></a>\
+                    "
+
+                switch( item.worker_type ) {
+                    case 0:
+                        item.worker_type = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.normal) %>'
+                        break
+                    case 1:
+                        item.worker_type = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.duration) %>'
+                        break
+                    case 2:
+                        item.worker_type = '<%= nomu.common.workerTypeTitle(nomu.common.workerType.daily) %>'
+                        break
+                    default:
+                        break
+                }
+
+                item.gender = item.idcard_number.substring( 7,8 ) == "1" ? "남자" : "여자"
+                
+                return item
+            })
+            table.rows.load(list)
+        }
+    </script>
+    <script>
+
+        let selectedUserId = '<%= nomu.user.user_id %>'
+        let selectedWorkerId = -1
+
+        jQuery(function ($) {
+            $('#entered').datepicker({
+                format: "yyyy/mm/dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
+                //endDate: "",
+                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
+                calendarWeeks : false, //캘린더 옆에 몇 주차인지 보여주는 옵션 기본값 false 보여주려면 true
+                clearBtn : false, //날짜 선택한 값 초기화 해주는 버튼 보여주는 옵션 기본값 false 보여주려면 true
+                disableTouchKeyboard : false,	//모바일에서 플러그인 작동 여부 기본값 false 가 작동 true가 작동 안함.
+                immediateUpdates: false,	//사용자가 보는 화면으로 바로바로 날짜를 변경할지 여부 기본값 :false 
+                multidate : false, //여러 날짜 선택할 수 있게 하는 옵션 기본값 :false 
+                multidateSeparator :",", //여러 날짜를 선택했을 때 사이에 나타나는 글짜 2019-05-01,2019-06-01
+                templates : {
+                    leftArrow: '&laquo;',
+                    rightArrow: '&raquo;'
+                }, //다음달 이전달로 넘어가는 화살표 모양 커스텀 마이징 
+                showWeekDays : true ,// 위에 요일 보여주는 옵션 기본값 : true
+                title: "입사일",	//캘린더 상단에 보여주는 타이틀
+                todayHighlight : true ,	//오늘 날짜에 하이라이팅 기능 기본값 :false 
+                weekStart : 1 ,//달력 시작 요일 선택하는 것 기본값은 0인 일요일 
+                toggleActive : true,	//이미 선택된 날짜 선택하면 기본값 : false인경우 그대로 유지 true인 경우 날짜 삭제
+                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
+                
+            });//datepicker end
+            $('#resigned').datepicker({
+                format: "yyyy/mm/dd",	//데이터 포맷 형식(yyyy : 년 mm : 월 dd : 일 )
+                //startDate: "",
+                autoclose : true,	//사용자가 날짜를 클릭하면 자동 캘린더가 닫히는 옵션
+                calendarWeeks : false, //캘린더 옆에 몇 주차인지 보여주는 옵션 기본값 false 보여주려면 true
+                clearBtn : false, //날짜 선택한 값 초기화 해주는 버튼 보여주는 옵션 기본값 false 보여주려면 true
+                disableTouchKeyboard : false,	//모바일에서 플러그인 작동 여부 기본값 false 가 작동 true가 작동 안함.
+                immediateUpdates: false,	//사용자가 보는 화면으로 바로바로 날짜를 변경할지 여부 기본값 :false 
+                multidate : false, //여러 날짜 선택할 수 있게 하는 옵션 기본값 :false 
+                multidateSeparator :",", //여러 날짜를 선택했을 때 사이에 나타나는 글짜 2019-05-01,2019-06-01
+                templates : {
+                    leftArrow: '&laquo;',
+                    rightArrow: '&raquo;'
+                }, //다음달 이전달로 넘어가는 화살표 모양 커스텀 마이징 
+                showWeekDays : true ,// 위에 요일 보여주는 옵션 기본값 : true
+                title: "퇴사일",	//캘린더 상단에 보여주는 타이틀
+                todayHighlight : true ,	//오늘 날짜에 하이라이팅 기능 기본값 :false 
+                weekStart : 1 ,//달력 시작 요일 선택하는 것 기본값은 0인 일요일 
+                toggleActive : true,	//이미 선택된 날짜 선택하면 기본값 : false인경우 그대로 유지 true인 경우 날짜 삭제
+                language : "ko"	//달력의 언어 선택, 그에 맞는 js로 교체해줘야한다.
+                
+            });//datepicker end
+        })
+
+        function togglePanelButton() {
+            $('#editWorkerButtons').toggleClass('hidden')
+            $('#newWorkerButtons').toggleClass('hidden')
+
+            selectedWorkerId = -1
+        }
+
+        function clear() {
+            $('input, textarea').each(
+                function(index){  
+                    var input = $(this)
+                    input.val("")
+                }
+            )
+            $('select').each(
+                function(index){  
+                    var input = $(this)
+                    input.prop("selectedIndex", 0)
+                }
+            )
+
+            $('#worked_on').val( "<%=nomu.user.name%>" )
+        }
+
+        function validateAll() {
+            let ret = validateAllInputs(inputs)
+
+            if ( validateAddress() == false ) {
+                ret = false
+            }
+
+            return ret
+        }
+
+        function doEdit() {
+
+            let success = validateAll()
+            let othersSuccess = withOther() 
+
+            if (isCollapsePanel($('#workerPanel'))) {
+                $('#workerPanel').click()
+                return
+            }
+
+            if ( success && othersSuccess ) {
+                if ( confirm("수정하시겠습니까?") == false ) {
+                    return
+                }
+                prepareSubmit()
+            }
+        }
+
+        function doCancelEdit() {
+            clear()
+            togglePanelButton()
+
+            if (isCollapsePanel($('#workerPanel'))==false) {
+                $('#workerPanel').click()
+            }
+        }
+
+        function cancelEdit() {
+            if ( confirm("수정을 취소하시겠습니까?") ) {
+                doCancelEdit()
+            }
+
+        }
+
+        function addWorker() {
+            if (isCollapsePanel($('#workerPanel'))) {
+                $('#workerPanel').click()
+                return
+            }
+
+            let success = validateAll()
+            let othersSuccess = withOther() 
+
+            if ( success && othersSuccess ) {
+                prepareSubmit()
+            }
+        }
+    </script>
+    <%- include( 'addressSearchScript' ) %>
+        <script src="assets/scripts/validate.js"></script>
+        <script>
+            let inputs = [
+                { id: "name", feedback_id: "name_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "idcard_number", feedback_id: "idcard_number_feedback", type: validate_types.idcard_number, minLen: 1, maxLen: 14, feedback: "형식을 확인해주세요.(ex: 111111-1111111)", required: true },
+                { id: "position", feedback_id: "position_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "part", feedback_id: "part_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "worked_on", feedback_id: "worked_on_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "(1-100자)", required: true },
+                { id: "entered", feedback_id: "entered_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: true },
+                { id: "resigned", feedback_id: "resigned_feedback", type: validate_types.none, minLen: 1, maxLen: 100, feedback: "날자를 선택해 주세요", required: false },
+                { id: "hp", feedback_id: "hp_feedback", type: validate_types.hp, minLen: 1, maxLen: 13, feedback: "형식을 확인해주세요.(ex: 010-111-11111)", required: true },
+                { id: "email", feedback_id: "email_feedback", type: validate_types.email, minLen: 1, maxLen: 100, feedback: "형식을 확인해주세요.(ex: xxxxxx@naver.com)", required: true },
+            ]
+
+            jQuery(function($){
+                initForm(inputs)
+            })
+
+            let withOther = () => {
+                let entered = $('#entered').val()
+                let resigned = $('#resigned').val()
+
+                if ( entered != "" && resigned != "" && entered > resigned ) {
+                    $('#resigned_feedback').text("퇴사일이 입사일보다 클 수 없습니다")
+                    return false
+                }
+
+                return true
+            }
+
+            function prepareSubmit() {
+                // TODO: 뷰 타입에 대한 분기 필요.
+                let isAdd = selectedWorkerId == -1 
+                $.ajax({
+                    type: isAdd ? "POST" : "PUT",
+                    url: "<%=config.path.rest%>v1/worker" + (isAdd ? "" : "/" + selectedWorkerId),
+                    data: $('#workerForm').serialize(),    
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        // 값들 다시 비우고, 접어.
+                        clear()
+                        $('#workerPanel').click()
+                        reloadTable(table, setData)
+
+                        if ( isAdd == false ) {
+                            doCancelEdit()
+                        }
+                        
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+            }
+
+            function editWorker( id ) {
+                if ( $('#editWorkerButtons').hasClass('hidden') ) {
+                    togglePanelButton()
+                }
+            
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/worker/" + id,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        // ajax 이후
+                        $('input, textarea, select').each(
+                            function(index){  
+                                var input = $(this)
+                                
+                                switch( input.attr('name') ) {
+                                    case "worker_id":
+                                        input.val( result.result.item.id )
+                                        selectedWorkerId = result.result.item.id
+                                        break
+                                    case "name":
+                                        input.val( result.result.item.name )
+                                        break
+                                    case "idcard_number":
+                                        input.val( result.result.item.idcard_number )
+                                        break
+                                    case "post_no":
+                                        input.val( result.result.item.post_no )
+                                        break
+                                    case "address":
+                                        input.val( result.result.item.address )
+                                        break
+                                    case "address_detail":
+                                        input.val( result.result.item.address_detail )
+                                        break
+                                    case "part":
+                                        input.val( result.result.item.part )
+                                        break
+                                    case "position":
+                                        input.val( result.result.item.position )
+                                        break
+                                    case "worked_on":
+                                        input.val( result.result.item.worked_on )
+                                        break
+                                    case "worker_type":
+                                        input.val( result.result.item.worker_type )
+                                        break
+                                    case "entered":
+                                        input.val( result.result.item.entered )
+                                        break
+                                    case "resigned":
+                                        input.val( result.result.item.resigned )
+                                        break
+                                    case "email":
+                                        input.val( result.result.item.email )
+                                        break
+                                    case "hp":
+                                        input.val( result.result.item.phone )
+                                        break
+                                }
+                            }
+                        )
+
+                        validateAll()
+
+                        if (isCollapsePanel($('#workerPanel')) == true) {
+                            $('#workerPanel').click()
+                            return
+                        }
+
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "근로자 등록에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "근로자 등록에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+
+            }
+
+            function deleteWorker( id ) {
+                if ( confirm( "정말 삭제하시겠습니까?\n근로자와 연관된 관련 자료들도 모두 조회 불가능합니다.") ) {
+
+                $.ajax({
+                    type: "DELETE",
+                    url: "<%=config.path.rest%>v1/worker/" + selectedWorkerId,
+                    data: {},    
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if(result.success == 1){
+                        // 값들 다시 비우고, 접어.
+                        clear()
+                        $('#workerPanel').click()
+                        reloadTable(table, setData)
+
+                        doCancelEdit()
+                        
+                    } else {	
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "작업에 실패하였습니다. 관리자에게 문의하세요." )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+                }
+            }
+
+        </script>
+        <script>
+            const uploadExcelButton = () => {
+                $('#excel').click()
+            }
+
+            const uploadExcel = () => {
+                // alert( "값들의 정확한 입력을 위한 추가 코드 작성 중입니다. 내일 오전 중 재 오픈 하겠습니다.")
+                // return
+
+                showSpinner()
+
+                var form = $('#excelForm')[0];  	 
+                //alert( JSON.stringify(form) )
+                // Create an FormData object          
+                var data = new FormData(form);    
+                //alert( JSON.stringify(data) )
+
+                // TODO: IE10 이하에서 FormData 때문에 안 될 수 있으니 확인 필요.. 근데 어짜피 서명 쪽 캔버스 쓰려면 IE10 미만 지원이 되려나..
+                $.ajax({
+                    type: "POST",
+                    url: "<%=config.path.rest%>v1/worker/excel",
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                    enctype: 'multipart/form-data',          
+                    data: data,          
+                    processData: false,    
+                    contentType: false,      
+                    cache: false,           
+                    timeout: 600000, 
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    let result = data
+                    reloadTable(table, setData)
+                    clear()
+                    if ( $('#newWorkerButtons').hasClass('hidden') ) {
+                        togglePanelButton()
+                    }
+                    if (isCollapsePanel($('#workerPanel'))==false) {
+                        $('#workerPanel').click()
+                    }
+                    
+                    if(result.success == 1){
+                        alert( "엑셀 입력에 성공하였습니다." )
+                    } else {
+                        if ( result.errMsg === 'undefined' ) {
+                            alert( "엑셀 입력에 실패하였습니다. 입력 폼을 확인해 주세요." )
+                        } else {
+                            alert( result.errMsg )
+                        }
+                    }
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+                    
+                    let result = eval("("+data.responseText+")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert( "통신에 실패하였습니다" )
+                    } else {
+                        alert( result.errMsg )
+                    }
+                });
+
+
+                // TODO 작업 완료 후, 인풋 필드 클리어. 또한 이 함수에선 시작 시 인풋 필드 비어있는지 체크해서 비었으면 리턴.
+            }
+
+            const downloadExcel = () => {
+                // alert( "값들의 정확한 입력을 위한 추가 코드 작성 중입니다. 내일 오전 중 재 오픈 하겠습니다.")
+                // return
+                
+                showSpinner()
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/worker/excel",
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                    xhrFields:{
+                        responseType: 'blob'
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    const fileName = "worker.xlsx"
+                    if (window.navigator.msSaveOrOpenBlob) {
+                        window.navigator.msSaveBlob(data, fileName);
+                        return;
+                    }
+                    const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel;"})
+                    const path = (window.URL ? URL : webkitURL).createObjectURL(blob);
+                    const link = document.createElement('a')
+                    link.href = path
+                    link.download = fileName
+                    link.click();
+                    (window.URL ? URL : webkitURL).revokeObjectURL(path)
+                    link.remove()
+
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+                    alert( "엑셀 다운로드에 실패하였습니다. 관리자에게 문의하세요." )
+                    
+                });
+            }
+        </script>
+</html>

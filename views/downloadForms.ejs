@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<%- include( 'head' , { title: "" } ) %>
+
+    <body>
+        <div class="main-content">
+            <div class="container-fluid">
+                <h3 class="page-title">
+                    서식다운로드
+                </h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- PANEL DEFAULT -->
+                        <div id="detailPanel" class="panel">
+                            <div class="panel-heading">
+                                <div class="right">
+                                    <button type="button" id="workerPanel" class="btn-toggle-collapse"><i
+                                            class="lnr lnr-chevron-up"></i></button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <i class="lnr lnr-download"></i> <span>  개인정보이용동의서 <a href="javascript:download('agreePersonalInfo.xls')">  다운로드</a></span>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <i class="lnr lnr-download"></i> <span>  사직서 <a href="javascript:download('resign.hwp')">  다운로드</a></span>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <i class="lnr lnr-download"></i> <span>  휴일대체동의서 <a href="javascript:download('agreeOffday.hwp')">  다운로드</a></span>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <i class="lnr lnr-download"></i> <span>  연장야간동의서 <a href="javascript:download('agreeNight.xlsx')">  다운로드</a></span>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <i class="lnr lnr-download"></i> <span>  보안및업무협약서 <a href="javascript:download('secret.hwp')">  다운로드</a></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END PANEL DEFAULT -->
+                    </div>
+                </div>
+            </div>
+            <%- include( 'spinner' ) %>
+        </div>
+    </body>
+
+    <!-- Javascript -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/vendor/footable/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Add in any FooTable dependencies we may need -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+    <script src="assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="assets/scripts/klorofil-common.js"></script>
+    <script src="assets/scripts/nomu-common.js"></script>
+    <script src="assets/scripts/nomu-common-control.js"></script>
+    <!-- FOO TABLE 필요시 모듈화 -->
+    <script src="assets/vendor/footable/js/footable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js" integrity="sha512-L4qpL1ZotXZLLe8Oo0ZyHrj/SweV7CieswUODAAPN/tnqN3PA1P+4qPu5vIryNor6HQ5o22NujIcAZIfyVXwbQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script>
+
+            const download = ( downloadedName ) => {
+
+                showSpinner()
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/util/file/form/" + downloadedName,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>',
+                    },  
+                    xhrFields:{
+                        responseType: 'blob'
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    hideSpinner()
+
+                    const fileName = downloadedName
+                    if (window.navigator.msSaveOrOpenBlob) {
+                        window.navigator.msSaveBlob(data, fileName);
+                        return;
+                    }
+                    let type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel;"
+                    if ( downloadedName.indexOf("hwp") !== -1 ) {
+                        type = "application/vnd.hancom.hwp"
+                    }
+                    const blob = new Blob([data], {type: type})
+                    const path = (window.URL ? URL : webkitURL).createObjectURL(blob);
+                    const link = document.createElement('a')
+                    link.href = path
+                    link.download = fileName
+                    link.click();
+                    (window.URL ? URL : webkitURL).revokeObjectURL(path)
+                    link.remove()
+
+                }).fail(function(data, textStatus, errorThrown){
+                    hideSpinner()
+                    alert( "다운로드에 실패하였습니다. 관리자에게 문의하세요." )
+                    
+                });
+            }
+        </script>
+</html>

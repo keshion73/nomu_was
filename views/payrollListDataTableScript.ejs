@@ -1,0 +1,55 @@
+
+        <script>
+            // modalTableSetting
+            let payrollTableSetting = {
+                "toggleColumn": "last",
+                "paging": {
+                    "enabled": true
+                },
+                "filtering": {
+                    "enabled": true
+                },
+                "sorting": {
+                    "enabled": true
+                },
+                "empty": "항목이 존재하지 않습니다.",
+                "columns": [
+                    { "name": "contract_id", "title": "#", "breakpoints": "xs" },
+                    { "name": "nameTag", "title": "이름" },
+                    { "name": "idcardNumber", "title": "주민번호", "breakpoints": "xs sm" },
+                    { "name": "part", "title": "직무" },
+                    { "name": "position", "title": "직급", "breakpoints": "xs md" },
+                    { "name": "workedOn", "title": "근로장소", "breakpoints": "xs" },
+                    { "name": "constract_type_string", "title": "계약형태" },
+                    { "name": "completed_string", "title": "입력상태", "breakpoints": "xs md sm" },
+                    { "name": "preview", "title": " ", "breakpoints": "xs md sm" },
+                    { "name": "sendMail", "title": " ", "breakpoints": "xs md sm" },
+                ]
+            }
+
+            // reloadTable
+            function reloadPayrollTable( table, next ) {
+                $.ajax({
+                    type: "GET",
+                    url: "<%=config.path.rest%>v1/payroll/list/" + formattedMonth,
+                    headers: {
+                        'Authorization': 'Bearer ' + '<%= nomu.token %>'
+                    },
+                }).done(function (data, textStatus, xhr) {
+                    let result = data
+                    if (result.success == 1) {
+                        next( table, result.result.list )
+                    } else {
+                        alert(result.errMsg)
+                    }
+                }).fail(function (data, textStatus, errorThrown) {
+                    let result = eval("(" + data.responseText + ")")
+
+                    if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+                        alert("네트워크 오류입니다.")
+                    } else {
+                        alert(result.errMsg)
+                    }
+                });
+            }
+        </script>

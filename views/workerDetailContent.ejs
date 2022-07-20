@@ -1,0 +1,95 @@
+<div class="modal-body">
+    <div class="container-fluid">
+        <!-- <h3 class="page-title">업체 정보</h3> -->
+        <form class="container-fluid" id="workerForm" action="join" method="POST">
+            <div class="row form-group">
+                <div class="col-md-2">
+                    <label for="name" class="text-primary">이름 *</label>
+                    <input id="name" name="name" type="text" class="form-control" placeholder="성명">
+                    <small class="invalid-feedback text-danger" id="name_feedback"></small>
+                </div>
+                <div class="col-md-2">
+                    <label for="idcard_number" class="text-primary">주민번호 *</label>
+                    <input name="idcard_number" id="idcard_number" type="text" class="form-control" placeholder="주민 번호">
+                    <small class="invalid-feedback text-danger" id="idcard_number_feedback"></small>
+                </div>
+                <div class="col-md-2">
+                    <label for="worker_type" class="text-primary">계약형태 *</label>
+                    <select name="worker_type" id="worker_type" class="form-control">
+                        <option value="0">정규직</option>
+                        <option value="1">기간직</option>
+                        <option value="2">일용직</option>
+                        <option value="3">셀프작성</option>
+                    </select>
+                    <small class="invalid-feedback text-danger" id="worker_type_feedback"></small>
+                </div>
+                <div class="col-md-2">
+                    <label for="hp" class="text-primary">연락처 *</label>
+                    <input id="hp" name="hp" type="text" class="form-control" placeholder="휴대폰">
+                    <small class="invalid-feedback text-danger" id="hp_feedback"></small>
+                </div>
+                <div class="col-md-4">
+                    <label for="email" class="text-primary">이메일 *</label>
+                    <input id="email" name="email" type="text" class="form-control" placeholder="이메일">
+                    <small class="invalid-feedback text-danger" id="email_feedback"></small>
+                </div>  
+            </div>
+            <div class="row form-group">
+                <div class="col-md-2">
+                    <label for="part" class="text-primary">직무 *</label>
+                    <input id="part" name="part" type="text" class="form-control" placeholder="직무">
+                    <small class="invalid-feedback text-danger" id="part_feedback"></small>
+                </div>
+                <div class="col-md-2">
+                    <label for="position" class="text-primary">직급 *</label>
+                    <input id="position" name="position" type="text" class="form-control" placeholder="직급">
+                    <small class="invalid-feedback text-danger" id="position_feedback"></small>
+                </div>
+                <div class="col-md-2">
+                    <label for="worked_on" class="text-primary">근로장소 *</label>
+                    <input id="worked_on" name="worked_on" type="text" class="form-control" placeholder="근무장소">
+                    <small class="invalid-feedback text-danger" id="worked_on_feedback"></small>
+                </div>
+                <div class="col-md-3">
+                    <label for="entered" class="text-primary">입사일 *</label>
+                    <input id="entered" name="entered" type="text" class="form-control" placeholder="입사일">
+                    <small class="invalid-feedback text-danger" id="entered_feedback"></small>
+                </div>
+                <div class="col-md-3">
+                    <label for="resigned">퇴사일</label>
+                    <input id="resigned" name="resigned" type="text" class="form-control" placeholder="퇴사일">
+                    <small class="invalid-feedback text-danger" id="resigned_feedback"></small>
+                </div>
+            </div>  
+            <div class="row form-group">
+                <div class="col-md-4">
+                    <label for="post_no" class="text-primary">주소 *</label>
+                    <div class="input-group">
+                        <input id="post_no" name="post_no" type="text" class="form-control" placeholder="우편번호" readonly>
+                        <span class="input-group-btn"><button type="button" class="btn btn-primary" id="search_address" onclick="javascript:showSearchAddress()">주소검색</button></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <input id="address" name="address" type="text" class="form-control" placeholder="주소" readonly>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <input onkeyup="javascript:validateAddress()" id="address_detail" name="address_detail" type="text" class="form-control" placeholder="상세주소">
+                    <small class="invalid-feedback text-danger" id="address_feedback"></small>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <small class="text-primary">* 표기된 항목은 필수 입력 항목입니다.</small>
+                    <small class="text-primary">* 핸드폰 번호는 카카오톡에 가입된 번호여야 합니다.</small>
+                </div>
+            </div>
+            <input id="worker_id" name="worker_id" type="hidden">
+        </form>
+    </div>      
+</div>

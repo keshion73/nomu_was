@@ -1,0 +1,101 @@
+<div class="row form-group<% if ( isTop == 1 ) { %> sep-top-line<% } %>">
+    <div class="col-md-2 <% if ( isDaily == 1 ) { %> hidden<% } %>">
+        <label for="schedule_<%=index%>" class="text-primary">
+            <% if ( schedule.type == nomu.common.scheduleType.basic ) { %>
+            기본 *
+            <% } else if ( schedule.type == nomu.common.scheduleType.biweekly ) { %>
+            격주 기본 *
+            <% } else if ( schedule.type == nomu.common.scheduleType.basic_option_day ) { %>
+            옵션 *
+            <% } else if ( schedule.type == nomu.common.scheduleType.biweekly_option_day ) { %>
+            옵션 *
+            <% } %>
+        </label>
+        <div class="input-group">
+            <select name="schedule_<%=index%>" id="schedule_<%=index%>" class="form-control">
+                <% if ( schedule.type == nomu.common.scheduleType.basic ) { %>
+                <option value="15" <% if ( schedule.day == 15 ) { %> selected <% } %>>월-금</option>
+                <option value="16" <% if ( schedule.day == 16 ) { %> selected <% } %>>월-토</option>
+                <option value="1" <% if ( schedule.day == 1 ) { %> selected <% } %>>월요일</option>
+                <option value="2" <% if ( schedule.day == 2 ) { %> selected <% } %>>화요일</option>
+                <option value="3" <% if ( schedule.day == 3 ) { %> selected <% } %>>수요일</option>
+                <option value="4" <% if ( schedule.day == 4 ) { %> selected <% } %>>목요일</option>
+                <option value="5" <% if ( schedule.day == 5 ) { %> selected <% } %>>금요일</option>
+                <option value="6" <% if ( schedule.day == 6 ) { %> selected <% } %>>토요일</option>
+                <option value="7" <% if ( schedule.day == 7 ) { %> selected <% } %>>일요일</option>
+                <option value="17" <% if ( schedule.day == 17 ) { %> selected <% } %>>월-일</option>
+                <% } else if ( schedule.type == nomu.common.scheduleType.biweekly ) { %>
+                <option value="15" <% if ( schedule.day == 15 ) { %> selected <% } %>>월-금</option>
+                <option value="16" <% if ( schedule.day == 16 ) { %> selected <% } %>>월-토</option>
+                <option value="1" <% if ( schedule.day == 1 ) { %> selected <% } %>>월요일</option>
+                <option value="2" <% if ( schedule.day == 2 ) { %> selected <% } %>>화요일</option>
+                <option value="3" <% if ( schedule.day == 3 ) { %> selected <% } %>>수요일</option>
+                <option value="4" <% if ( schedule.day == 4 ) { %> selected <% } %>>목요일</option>
+                <option value="5" <% if ( schedule.day == 5 ) { %> selected <% } %>>금요일</option>
+                <option value="6" <% if ( schedule.day == 6 ) { %> selected <% } %>>토요일</option>
+                <option value="7" <% if ( schedule.day == 7 ) { %> selected <% } %>>일요일</option>
+                <option value="17" <% if ( schedule.day == 17 ) { %> selected <% } %>>월-일</option>
+                <% } else if ( schedule.type == nomu.common.scheduleType.basic_option_day || schedule.type == nomu.common.scheduleType.biweekly_option_day ) { %>
+                <option value="1" <% if ( schedule.day == 1 ) { %> selected <% } %>>월요일</option>
+                <option value="2" <% if ( schedule.day == 2 ) { %> selected <% } %>>화요일</option>
+                <option value="3" <% if ( schedule.day == 3 ) { %> selected <% } %>>수요일</option>
+                <option value="4" <% if ( schedule.day == 4 ) { %> selected <% } %>>목요일</option>
+                <option value="5" <% if ( schedule.day == 5 ) { %> selected <% } %>>금요일</option>
+                <option value="6" <% if ( schedule.day == 6 ) { %> selected <% } %>>토요일</option>
+                <option value="7" <% if ( schedule.day == 7 ) { %> selected <% } %>>일요일</option>
+                <% } %>
+            </select>
+            <% if ( schedule.type == nomu.common.scheduleType.basic_option_day || schedule.type == nomu.common.scheduleType.biweekly_option_day ) { %>
+                <span class="input-group-btn"><a class="form-control" href="javascript:removeSchedule( <%=index%> )"><i class="fa fa-minus-circle"></i></a></span>
+            <% } else { %>
+                <span class="input-group-btn"><a class="form-control" href="javascript:addSchedule( <%=index%> )"><i class="fa fa-plus-circle"></i></a></span>
+            <% } %>
+        </div>
+        <small class="invalid-feedback text-danger" id="schedule_<%=index%>_feedback"></small>
+    </div>
+    <div class="col-md-2">
+        <label for="working_duration_<%=index%>" class="text-primary">출근/퇴근 *</label>
+        <input value="<%=schedule.startend%>" id="working_duration_<%=index%>" name="working_duration_<%=index%>" type="text" class="form-control" placeholder="09:00-18:00">
+        <small class="invalid-feedback text-danger" id="working_duration_<%=index%>_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="off1_<%=index%>">휴게1시작/종료</label>
+        <input value="<%=schedule.rest1%>" id="off1_<%=index%>" name="off1_<%=index%>" type="text" class="form-control" placeholder="13:00-14:00">
+        <small class="invalid-feedback text-danger" id="off1_<%=index%>_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="off2_<%=index%>">휴게2시작/종료</label>
+        <input value="<%=schedule.rest2%>" id="off2_<%=index%>" name="off2_<%=index%>" type="text" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="off2_<%=index%>_feedback"></small>
+    </div>  
+    <div class="col-md-2">
+        <label for="off3_<%=index%>">휴게3시작/종료</label>
+        <input value="<%=schedule.rest3%>"  id="off3_<%=index%>" name="off3_<%=index%>" type="text" class="form-control" placeholder="">
+        <small class="invalid-feedback text-danger" id="off3_<%=index%>_feedback"></small>
+    </div> 
+    <div class="col-md-2<% if ( isDaily == 1 ) { %> hidden<% } %>">
+        <label for="day_option_day_<%=index%>" class="text-primary">근무횟수 *</label>
+        <% if ( schedule.type == nomu.common.scheduleType.basic ) { %>
+            <select name="day_option_day_<%=index%>" id="day_option_day_<%=index%>" class="form-control" disabled>
+                <option value="0">매주</option>
+            </select>
+        <% } else if ( schedule.type == nomu.common.scheduleType.biweekly ) { %>
+            <select name="day_option_day_<%=index%>" id="day_option_day_<%=index%>" class="form-control" disabled>
+                <option value="10">격주</option>
+            </select>
+        <% } else if ( schedule.type == nomu.common.scheduleType.basic_option_day ) { %>
+            <select name="day_option_day_<%=index%>" id="day_option_day_<%=index%>" class="form-control">
+                <option value="4" <% if ( schedule.pattern == 4 ) { %> selected <% } %>>월4회</option>
+                <option value="3" <% if ( schedule.pattern == 3 ) { %> selected <% } %>>월3회</option>
+                <option value="2" <% if ( schedule.pattern == 2 ) { %> selected <% } %>>월2회</option>
+                <option value="1" <% if ( schedule.pattern == 1 ) { %> selected <% } %>>월1회</option>
+            </select>
+        <% } else if ( schedule.type == nomu.common.scheduleType.biweekly_option_day ) { %>
+            <select name="day_option_day_<%=index%>" id="day_option_day_<%=index%>" class="form-control">
+                <option value="12" <% if ( schedule.pattern == 12 ) { %> selected <% } %>>월2회</option>
+                <option value="11" <% if ( schedule.pattern == 11 ) { %> selected <% } %>>월1회</option>
+            </select>
+        <% } %>
+        <small class="invalid-feedback text-danger" id="day_option_day_<%=index%>_feedback"></small>
+    </div> 
+</div>

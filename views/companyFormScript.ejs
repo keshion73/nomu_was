@@ -1,0 +1,206 @@
+<script src="assets/scripts/validate.js"></script>
+<script>
+	let password = { id: "password", feedback_id: "password_feedback", type: validate_types.password, minLen: 8, maxLen: 25, feedback: "", required: true }
+	let password_confirm = { id: "password_confirm", feedback_id: "password_confirm_feedback", type: validate_types.password, minLen: 8, maxLen: 25, feedback: "비밀번호가 일치하지 않습니다.", required: true }
+
+    function initFormPasswordConfirm() {
+		let inputs = [
+			password,
+			password_confirm,
+		]
+
+		for ( let i=0; i<inputs.length; i++ ) {
+			$('#' + inputs[i].id ).keyup( () => {
+				validatePasswordConfirm( inputs[0], inputs[1] )
+			})
+		}
+	}
+
+	function validateStamp() {
+        let stampVal = $('#stamp_picture_url' ).val()
+        let stampTempVal = $('#stamp_picture_temp_url' ).val()
+
+		if ( stampVal == "" && stampTempVal == "" ) {
+			$('#stamp_feedback' ).text("도장 이미지를 등록해 주세요")
+			return false
+		}
+
+		$('#stamp_feedback' ).text("")
+		return true
+	}
+
+	function validatePasswordConfirm( input0, input1 ) {
+		let text = $('#' + input0.id ).val()
+		let text_confirm = $('#' + input1.id ).val()
+
+		let validated = text == text_confirm
+
+		if ( validated == true ) {
+			$('#' + input1.feedback_id ).html("")
+		} else {
+			$('#' + input1.feedback_id ).html(input1.feedback)
+		}
+
+		return validated
+	}
+
+	function validateAll(inputs) {
+		
+		let ret = true
+
+		ret = validateAllInputs(inputs)
+
+		if ( validatePasswordConfirm( password, password_confirm ) == false ) {
+			ret = false
+		}
+		if ( validateAddress() == false ) {
+			ret = false
+		}
+		if ( validateStamp() == false ) {
+			ret = false
+		}
+
+		return ret
+	}
+
+	function prepareSubmit( inputs, withOther ) {
+		// TODO: validate, ajax
+		let success = validateAll(inputs)
+		let othersSuccess = withOther() 
+
+		let user_id = $('#user_id').val()
+
+		if ( success && othersSuccess ) {
+			if ( user_id == "" ) {
+				// 회원가입
+				$.ajax({
+					type: "POST",
+					url: "<%=config.path.rest%>v1/auth/signUp",
+					data: $('#companyForm').serialize(),    
+				}).done(function (data, textStatus, xhr) {
+					let result = data
+					if(result.success == 1){
+						let formdatas = $('#companyForm').serializeArray()
+						//$.cookie( '<%=config.cookie.autoLoginKey%>', formdatas.find( (item) => { return item.name == "autologin" } ).value )
+						$.cookie( '<%=config.cookie.uidKey%>', formdatas.find( (item) => { return item.name == "email_id" } ).value )
+						$.cookie( '<%=config.cookie.nomuSessionId%>', result.result.jwtToken )
+
+						location.href = "main"
+					} else {	
+						if ( result.errMsg === 'undefined' ) {
+							alert( "회원가입에 실패하였습니다. 관리자에게 문의하세요." )
+						} else {
+							alert( result.errMsg )
+						}
+					}
+				}).fail(function(data, textStatus, errorThrown){
+					let result = eval("("+data.responseText+")")
+
+					if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+						alert( "회원가입에 실패하였습니다. 관리자에게 문의하세요." )
+					} else {
+						alert( result.errMsg )
+					}
+				});
+			} else {
+				// 수정
+				$.ajax({
+					type: "PUT",
+					url: "<%=config.path.rest%>v1/company/" + user_id,
+					data: $('#companyForm').serialize(),    
+                    headers: {
+					    'Authorization': 'Bearer ' + '<%= nomu.token %>'
+                    },
+				}).done(function (data, textStatus, xhr) {
+					let result = data
+					if(result.success == 1){
+						$.cookie( '<%=config.cookie.nomuSessionId%>', result.result.jwtToken )
+						alert( "회원 정보가 수정되었습니다." )
+
+						location.reload()
+					} else {	
+						if ( result.errMsg === 'undefined' ) {
+							alert( "회원 정보 수정에 실패하였습니다. 관리자에게 문의하세요." )
+						} else {
+							alert( result.errMsg )
+						}
+					}
+				}).fail(function(data, textStatus, errorThrown){
+					let result = eval("("+data.responseText+")")
+
+					if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+						alert( "회원 정보 수정에 실패하였습니다. 관리자에게 문의하세요." )
+					} else {
+						alert( result.errMsg )
+					}
+				});
+			}
+			
+		}
+
+	}
+
+	function uploadTempStamp() {
+		var form = $('#companyForm')[0];  	    
+    	// Create an FormData object          
+    	var data = new FormData(form); 
+
+		// TODO: IE10 이하에서 FormData 때문에 안 될 수 있으니 확인 필요.. 근데 어짜피 서명 쪽 캔버스 쓰려면 IE10 미만 지원이 되려나..
+		$.ajax({
+				type: "POST",
+				url: "<%=config.path.rest%>v1/util/file/temp",
+        		enctype: 'multipart/form-data',          
+				data: data,          
+				processData: false,    
+				contentType: false,      
+				cache: false,           
+				timeout: 600000, 
+			}).done(function (data, textStatus, xhr) {
+				let result = data
+				if(result.success == 1){
+					$('#stamp_picture_temp_url' ).val( result.result.url )
+					$('#stamp_picture_temp_guid' ).val( result.result.guid )
+					setStampPrev()
+				} else {
+					if ( result.errMsg === 'undefined' ) {
+						alert( "통신에 실패하였습니다" )
+					} else {
+						alert( result.errMsg )
+					}
+				}
+				validateStamp()
+			}).fail(function(data, textStatus, errorThrown){
+				let result = eval("("+data.responseText+")")
+
+				if ( typeof result === 'undefined' || typeof result.errMsg === 'undefined') {
+					alert( "통신에 실패하였습니다" )
+				} else {
+					alert( result.errMsg )
+				}
+				validateStamp()
+			});
+	}
+
+
+	function setStampPrev() {
+		// stamp_picture_url
+		// stamp_picture_temp_url
+		// prevBox
+		// preBoxImg
+		let loadedStamp = $('#stamp_picture_url')
+		let tempStamp = $('#stamp_picture_temp_url')
+		let box = $('#prevBox')
+		let img = $('#preBoxImg')
+
+		let src = tempStamp.val()
+		if ( src == "" ) {
+			src = loadedStamp.val()
+		}
+		if ( src == "" ) {
+			if ( box.hasClass('hidden') == false ) box.addClass('hidden')
+		} else {
+			img.attr('src', src )
+			box.removeClass('hidden')
+		}
+	}
+</script>

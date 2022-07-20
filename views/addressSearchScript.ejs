@@ -1,0 +1,33 @@
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    function showSearchAddress() {
+        //카카오 지도 발생
+        new daum.Postcode({
+            oncomplete: (data) => { //선택시 입력값 세팅
+                console.log( data )
+                $('#post_no').val( data.zonecode)
+                $('#address').val( data.address)
+                document.querySelector("input[name=address_detail]").focus(); //상세입력 포커싱
+                validateAddress()
+            }
+        }).open();     
+    }
+
+    function validateAddress() {
+        let post_no = $('#post_no' ).val()
+        let address = $('#address' ).val()
+        let address_detail = $('#address_detail' ).val()
+
+        if ( post_no == '' || address == '' || address_detail == '' ) {
+            console.log( "address is not validated")
+            $('#address_feedback' ).text('주소를 입력해 주세요')
+
+            return false
+        } else {
+            console.log( "address is validated")
+            $('#address_feedback' ).text('')
+
+            return true
+        }
+    }
+</script>
